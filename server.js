@@ -29,10 +29,6 @@ server.get('/task/:id', function (req, res, next) {
 })
 
 server.post('/task', function (req, res, next) {
-  if (req.params.name === undefined) {
-    return next(new restify.InvalidArgumentError('Name must be supplied'))
-  }
-
   taskSave.create({ name: req.params.name }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(201, task)
@@ -40,10 +36,6 @@ server.post('/task', function (req, res, next) {
 })
 
 server.put('/task/:id', function (req, res, next) {
-  if (req.params.name === undefined) {
-        return next(new restify.InvalidArgumentError('Name must be supplied'))
-  }
-
   taskSave.update({ _id: req.params.id, name: req.params.name }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(200)
