@@ -45,7 +45,7 @@
     function getCollection(text)
     {
         console.log(text)
-       	reqRes('/app', function(){}, {method:'POST', data: 'POST samthing '}); 	
+       	reqRes('http://localhost:3000/task', function(){}, {method:'POST', data: 'name=POST samthing'}); 	
        // reqRes('/app', function(){}, {method:'PUT', data: 'PUT samthing'}); 
     }
 
@@ -55,7 +55,7 @@
     */
 	function init()
 	{
-		reqRes('data.txt', getCollection);
+		reqRes('task.txt', getCollection);
 	}
 	
 	/**

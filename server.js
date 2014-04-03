@@ -1,6 +1,6 @@
-var restify = require('restify')
-  , taskSave = require('save')('task')
-  , server = restify.createServer({ name: 'my-api' })
+var restify = require('restify'),
+    taskSave = require('save')('task'),
+    server = restify.createServer({ name: 'my-api' })
 
 server.listen(3000, function () {
   console.log('%s listening at %s', server.name, server.url)
@@ -12,13 +12,14 @@ server
 
 
 server.get('/task', function (req, res, next) {
-  taskSave.find({}, function (tasks) {
+  taskSave.find({}, function (error, tasks) {
     res.send(tasks)
   })
 })
 
 server.get('/task/:id', function (req, res, next) {
-  taskSave.findOne({ _id: req.params.id }, function (task) {
+  taskSave.findOne({ _id: req.params.id }, function (error, task) {
+    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     if (task) {
       res.send(task)
     } else {
@@ -28,19 +29,60 @@ server.get('/task/:id', function (req, res, next) {
 })
 
 server.post('/task', function (req, res, next) {
-  taskSave.create({ name: req.params.name }, function (task) {
+  if (req.params.name === undefined) {
+    return next(new restify.InvalidArgumentError('Name must be supplied'))
+  }
+
+  taskSave.create({ name: req.params.name }, function (error, task) {
+    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(201, task)
   })
 })
 
 server.put('/task/:id', function (req, res, next) {
-  taskSave.update({ _id: req.params.id, name: req.params.name }, function () {
+  if (req.params.name === undefined) {
+        return next(new restify.InvalidArgumentError('Name must be supplied'))
+  }
+
+  taskSave.update({ _id: req.params.id, name: req.params.name }, function (error, task) {
+    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(200)
   })
 })
 
 server.del('/task/:id', function (req, res, next) {
-  taskSave.delete(req.params.id, function () {
+  taskSave.delete(req.params.id, function (error, task) {
+    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send()
   })
 })
+
+
+
+
+
+
+
+
+
+var express = require('express');
+var app = express();
+
+var appServer = function(req, res, next)
+{
+    next();
+}
+
+app.use(appServer);
+app.use(express.static(__dirname));
+app.listen(5000);
+
+
+
+
+
+
+
+
+
+
