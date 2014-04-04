@@ -1,53 +1,90 @@
 (function ()
 {
-
-	function read(url,callback, http)
-	{
-		http.open('GET', url, true);
-		http.onreadystatechange = function() {             
-         		if (http.readyState === 4 )  
+	function reqRes(url, callback, callbackError, obj) 
+    {
+    	var options = obj || {},
+    		method = options.method || 'GET',
+     		data = null,
+     		xhr = new XMLHttpRequest();
+     	
+     	xhr.open(method, url, true);
+     	if(options.data)
+     	{
+     		if(method ==='PUT' || method === 'POST')
+     		{
+     			xhr.setRequestHeader('Content-Type', 'application/json');
+     		    data = options.data;
+     		}
+     	}
+        xhr.onreadystatechange = function() {             
+         		if (xhr.readyState === 4 )  
          	    {
-         	        if(http.status === 200)
+         	        if(xhr.status === 200)
          	        {
-         	            callback(http.responseText);
+         	            callback(xhr.responseText);
          	        }
-         	        if(http.status === 404)
+         	        else
          	        {
-         	            alert('Error 404. Check the file path to the data.');
+         	            callbackError(xhr.statusText);
          	        }
          	    }  
             }
-        http.send();
+        xhr.send(data);
+    } 
+
+    function showError(text)
+    {
+    	console.log(text);
+    }
+
+    function showTask(text)
+    {
+     	console.log((JSON.parse(text)).task);
+    }
+
+
+	function readAll(callback)
+	{
+		reqRes('http://localhost:3000/task', callback, showError);
 	}
 
-	function create(url, data, http)
+	function readById(callback, id)
 	{
-		http.open('POST', url, true);
-		http.setRequestHeader('Content-Type', 'application/json');
-        http.send(data);
+		reqRes('http://localhost:3000/task/' + id, callback, showError);
 	}
 
-	function updata(url, data, http)
+	function readByStatus(callback, status)
 	{
-		http.open('PUT', url, true);
-		http.setRequestHeader('Content-Type', 'application/json');
-        http.send(data);
+		reqRes('http://localhost:3000/task/' + status, callback, showError);
 	}
 
-	function remove(url, http)
+	function create(task, callback)
 	{
-		http.open("DELETE", url ,true);
-		http.send();
+		reqRes('http://localhost:3000/task', callback, showError, {method : 'POST', data : JSON.stringify(task)});
+	}
+
+	function updata(task, callback, id)
+	{
+		reqRes('http://localhost:3000/task/'+id, callback, showError, {method : 'PUT', data : JSON.stringify(task)});
+	}
+
+	function remove(callback, id)
+	{
+		reqRes('http://localhost:3000/task/'+id, callback, showError, {method: 'DELETE', data : null});
 	}
 
 	function init()
 	{
-		var xhr = new XMLHttpRequest();
-		//create('http://localhost:3000/task', JSON.stringify({task :  "do something", status : false}), xhr);
-		//create('http://localhost:3000/task', JSON.stringify({name : 'do something else'}), xhr);
-		read('http://localhost:3000/task/1', function(text){console.log((JSON.parse(text)).task);}, xhr);
-		//updata('http://localhost:3000/task/1', JSON.stringify({name : 'do something else', status : true}), xhr);
-		//remove('http://localhost:3000/task/1', xhr);
+		
+		//readAll(showTask);
+		//readById(showTask, 2);
+
+		create({task:'do something', status: false},function(){});
+		create({task:'do something else', status: true},function(){});
+		create({task:'do something else and go', status: false},function(){});
+		readByStatus(showTask, false);
+		//updata({task:'do something else', status: true,},function(){}, 1);
+		//remove(function(){console.log("delete");}, 1);
 		
 
 	}
