@@ -1,61 +1,54 @@
 (function ()
 {
-	
-	/**
-    * The function that displays a collection of object on the screen.
-	* @param {String} url. Adres of file which contains data.
-	* @param {Function} callback. Function which will run after receiving data.
-	* @param {Object} obj.
-		* @property {String} method. Name of method for creation XmlHttpRequest.
-		* @property {String} data. Data to send to the server
-    */	
-    function reqRes(url, callback, obj) 
-    {
-
-    	var options = obj || {};
-    	var method = options.method || 'GET';
-     	var xhr = new XMLHttpRequest();
-     	var data = null;
-
-     	xhr.open(method, url, true);
-     	if(options.data && method === 'POST')
-     	{
-     		data = options.data;
-     	}
-        xhr.onreadystatechange = function() {             
-         		if (xhr.readyState === 4 )  
+	function read(url,callback, http)
+	{
+		http.open('GET', url, true);
+		http.onreadystatechange = function() {             
+         		if (http.readyState === 4 )  
          	    {
-         	        if(xhr.status === 200)
+         	        if(http.status === 200)
          	        {
-         	            callback(xhr.responseText);
+         	            callback(http.responseText);
          	        }
-         	        else
+         	        if(http.status === 404)
          	        {
          	            alert('Error 404. Check the file path to the data.');
          	        }
          	    }  
             }
-        xhr.send(data);
-    } 
-    /**
-    * Get string which will be a collection of object then sort and disply.
-    * After send data to server.
-	* @param {String} text. Data for sorting and disply.
-    */	
-    function getCollection(text)
-    {
-        console.log(text)
-       	reqRes('http://localhost:3000/task', function(){}, {method:'POST', data: 'name=POST samthing'}); 	
-       // reqRes('/app', function(){}, {method:'PUT', data: 'PUT samthing'}); 
-    }
+        http.send();
+	}
 
-    
-	/**
-    * The function is executed after loading html page.
-    */
+	function create(url, data, http)
+	{
+		http.open('POST', url, true);
+		http.setRequestHeader('Content-Type', 'application/json');
+        http.send(data);
+	}
+
+	function updata(url, data, http)
+	{
+		http.open('PUT', url, true);
+		http.setRequestHeader('Content-Type', 'application/json');
+        http.send(data);
+	}
+
+	function remove(url, http)
+	{
+		http.open("DELETE", url ,true);
+		http.send();
+	}
+
 	function init()
 	{
-		reqRes('task.txt', getCollection);
+		var xhr = new XMLHttpRequest();
+		create('http://localhost:3000/task', JSON.stringify({name : 'do something'}), xhr);
+		create('http://localhost:3000/task', JSON.stringify({name : 'do something else'}), xhr);
+		//read('http://localhost:3000/task', function(text){console.log(text);}, xhr);
+		//updata('http://localhost:3000/task/1', JSON.stringify({name : 'do something else'}), xhr);
+		remove('http://localhost:3000/task/1', xhr);
+		
+
 	}
 	
 	/**

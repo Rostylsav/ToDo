@@ -1,3 +1,7 @@
+var express = require('express');
+var app = express();
+
+
 var restify = require('restify'),
     taskSave = require('save')('task'),
     server = restify.createServer({ name: 'my-api' })
@@ -15,9 +19,10 @@ server.get('/task', function (req, res, next) {
   taskSave.find({}, function (error, tasks) {
     res.send(tasks)
   })
-})
+});
 
 server.get('/task/:id', function (req, res, next) {
+    console.log(req.params.id);
   taskSave.findOne({ _id: req.params.id }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     if (task) {
@@ -26,39 +31,28 @@ server.get('/task/:id', function (req, res, next) {
       res.send(404)
     }
   })
-})
+});
 
-server.post('/task', function (req, res, next) {
+server.post('/task', function (req, res, next) {    
   taskSave.create({ name: req.params.name }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(201, task)
   })
-})
+});
 
 server.put('/task/:id', function (req, res, next) {
   taskSave.update({ _id: req.params.id, name: req.params.name }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(200)
   })
-})
+});
 
 server.del('/task/:id', function (req, res, next) {
   taskSave.delete(req.params.id, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send()
   })
-})
-
-
-
-
-
-
-
-
-
-var express = require('express');
-var app = express();
+});
 
 var appServer = function(req, res, next)
 {
