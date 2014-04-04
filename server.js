@@ -22,7 +22,6 @@ server.get('/task', function (req, res, next) {
 });
 
 server.get('/task/:id', function (req, res, next) {
-    console.log(req.params.id);
   taskSave.findOne({ _id: req.params.id }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     if (task) {
@@ -34,14 +33,14 @@ server.get('/task/:id', function (req, res, next) {
 });
 
 server.post('/task', function (req, res, next) {    
-  taskSave.create({ name: req.params.name }, function (error, task) {
+  taskSave.create({ task: req.params.task , status: req.params.status }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(201, task)
   })
 });
 
 server.put('/task/:id', function (req, res, next) {
-  taskSave.update({ _id: req.params.id, name: req.params.name }, function (error, task) {
+  taskSave.update({ _id: req.params.id, task: req.params.task, status: req.params.status }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(200)
   })

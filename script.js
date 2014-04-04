@@ -43,22 +43,17 @@
 	function init()
 	{
 		var xhr = new XMLHttpRequest();
-		var obj ={
-				task:'do something else and go',
-				status:'false'
-			}
-			console.log(obj.toString());
-		//create('http://localhost:3000/task', JSON.stringify({name :  obj.toString()}), xhr);
+		//create('http://localhost:3000/task', JSON.stringify({task :  "do something", status : false}), xhr);
 		//create('http://localhost:3000/task', JSON.stringify({name : 'do something else'}), xhr);
-		read('http://localhost:3000/task/1', function(text){var map = JSON.parse(text);console.log(map.name);}, xhr);
-		//updata('http://localhost:3000/task/1', JSON.stringify({name : 'do something else'}), xhr);
+		read('http://localhost:3000/task/1', function(text){console.log((JSON.parse(text)).task);}, xhr);
+		//updata('http://localhost:3000/task/1', JSON.stringify({name : 'do something else', status : true}), xhr);
 		//remove('http://localhost:3000/task/1', xhr);
 		
 
 	}
 	
 	/**
-    * assignment function init () global status.
+    * assignment function init () global status.JSON.parse
     */
 	window.init = init;
 }())
