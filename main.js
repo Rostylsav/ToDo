@@ -40,7 +40,6 @@
         var button=document.createElement('button');
             button.setAttribute('data-id',id);
             button.className = "button";
-
             button.addEventListener('click',remove, false);
 
         button.appendChild(document.createTextNode('R'));
@@ -48,7 +47,6 @@
         document.getElementById('enterTask').value=''; 
 
         containerOneTask.appendChild(checkbox);
-
         containerOneTask.appendChild(div);
         containerOneTask.appendChild(button);
         container.appendChild(containerOneTask);
@@ -63,10 +61,43 @@
                         {
                             showTask(colectionOfTask[i].task, colectionOfTask[i].status, colectionOfTask[i]._id);
                         }
+                        showBottomContainer();
                 }, error);
        
     }
     
+    function showBottomContainer()
+    {
+        var container= document.getElementById('containerShowTask');
+
+        var containerBottom = document.createElement('div');
+            containerBottom.setAttribute('data-id',0);
+            containerBottom.className="containerOneTask";
+
+        var countOfTask = document.createElement('div');
+            countOfTask.setAttribute('data-id',0);
+            countOfTask.className = 'showCountOfTask';
+            countOfTask.appendChild(document.createTextNode('Task to do: '+ 12));
+
+        var active=document.createElement('button');
+            active.setAttribute('data-id',0);
+            active.className = "buttomFilter";
+            active.addEventListener('click', active, false);
+            active.appendChild(document.createTextNode('Active'));
+
+        var copleted=document.createElement('button');
+            copleted.setAttribute('data-id',0);
+            copleted.className = "buttomFilter";
+            copleted.addEventListener('click', completed, false);
+            copleted.appendChild(document.createTextNode('Copleted'));
+
+        containerBottom.appendChild(countOfTask);
+        containerBottom.appendChild(active);
+        containerBottom.appendChild(copleted);
+        container.appendChild(containerBottom);
+
+    }
+
     function mark(e)
     {
         var status = false;
@@ -82,6 +113,15 @@
         removeById(showAllTask, error, e.target.getAttribute('data-id'));
     }
 
+    function active()
+    {
+
+    }
+
+    function completed()
+    {
+        
+    }
 
     function init()
     {
