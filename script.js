@@ -1,5 +1,6 @@
 (function ()
 {
+
 	function read(url,callback, http)
 	{
 		http.open('GET', url, true);
@@ -42,11 +43,16 @@
 	function init()
 	{
 		var xhr = new XMLHttpRequest();
-		create('http://localhost:3000/task', JSON.stringify({name : 'do something'}), xhr);
-		create('http://localhost:3000/task', JSON.stringify({name : 'do something else'}), xhr);
-		//read('http://localhost:3000/task', function(text){console.log(text);}, xhr);
+		var obj ={
+				task:'do something else and go',
+				status:'false'
+			}
+			console.log(obj.toString());
+		//create('http://localhost:3000/task', JSON.stringify({name :  obj.toString()}), xhr);
+		//create('http://localhost:3000/task', JSON.stringify({name : 'do something else'}), xhr);
+		read('http://localhost:3000/task/1', function(text){var map = JSON.parse(text);console.log(map.name);}, xhr);
 		//updata('http://localhost:3000/task/1', JSON.stringify({name : 'do something else'}), xhr);
-		remove('http://localhost:3000/task/1', xhr);
+		//remove('http://localhost:3000/task/1', xhr);
 		
 
 	}
