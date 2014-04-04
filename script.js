@@ -53,11 +53,6 @@
 		reqRes('http://localhost:3000/task/' + id, callback, showError);
 	}
 
-	function readByStatus(callback, status)
-	{
-		reqRes('http://localhost:3000/task/' + status, callback, showError);
-	}
-
 	function create(task, callback)
 	{
 		reqRes('http://localhost:3000/task', callback, showError, {method : 'POST', data : JSON.stringify(task)});
@@ -78,15 +73,11 @@
 		
 		//readAll(showTask);
 		//readById(showTask, 2);
-
 		create({task:'do something', status: false},function(){});
 		create({task:'do something else', status: true},function(){});
 		create({task:'do something else and go', status: false},function(){});
-		readByStatus(showTask, false);
 		//updata({task:'do something else', status: true,},function(){}, 1);
 		//remove(function(){console.log("delete");}, 1);
-		
-
 	}
 	
 	/**
