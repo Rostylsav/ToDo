@@ -40,7 +40,7 @@ server.post('/task', function (req, res, next) {
 });
 
 server.put('/task/:id', function (req, res, next) {
-  taskSave.update({ _id: req.params.id, task: req.params.task, status: req.params.status }, function (error, task) {
+  taskSave.update({ _id: req.params.id, status: req.params.status }, function (error, task) {
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     res.send(200)
   })

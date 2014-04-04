@@ -4,9 +4,9 @@
     {
         console.log(text);
     }
-    function ifPressEnter()
+    function ifPressEnter(e)
     {
-        if (event.keyCode === 13)
+        if (e.keyCode === 13)
         {
             create({ task: document.getElementById('enterTask').value, status: false}, function(){
                 readAll(showAllTask, error);
@@ -41,6 +41,9 @@
             button.setAttribute('data-id',id);
             button.className = "button";
 
+            button.addEventListener('click',remove, false);
+
+        button.appendChild(document.createTextNode('R'));
         div.appendChild(document.createTextNode(text));
         document.getElementById('enterTask').value=''; 
 
@@ -71,18 +74,18 @@
         {
             status = true;
         }
+        updataById({status : status}, showAllTask, error, e.target.getAttribute('data-id'));
+    }
 
-        readById(function(text){
-            var colection = JSON.parse(text);
-            updataById({task : colection.task, status : status}, function(){
-                showAllTask();
-            },error, e.target.getAttribute('data-id'));
-        }, error, e.target.getAttribute('data-id'));
+    function remove(e)
+    {
+        removeById(showAllTask, error, e.target.getAttribute('data-id'));
     }
 
 
     function init()
     {
+        document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false)
         showAllTask();
     }
     window.ifPressEnter = ifPressEnter;
