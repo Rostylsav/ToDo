@@ -26,24 +26,6 @@ body{
 input[type="checkbox"],input[type="text"] {
 	outline: none;
 }
-#checkAll{
-	float:left;
-	width: 60px;
-	-webkit-transform: rotate(90deg);
-	-ms-transform: rotate(90deg);
-	transform: rotate(90deg);
-	-webkit-appearance: none;
-	appearance: none;
-}
-#checkAll:before{
-	content: '>>';
-	font-size: 28px;
-	color: #d9d9d9;
-	padding: 0 25px 7px;
-}
-#checkAll:checked:before {
-	color: #FF0000;
-}
 
 .containerOneTask{
 	width: 550px;

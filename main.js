@@ -1,15 +1,18 @@
-(function(){
+(function()
+{
+    var taskToDo = 0;
 
     function error(text)
     {
-        console.log(text);
+        console.log('Error is :' + text);
     }
+
     function ifPressEnter(e)
     {
         if (e.keyCode === 13)
         {
             create({ task: document.getElementById('enterTask').value, status: false}, function(){
-                readAll(showAllTask, error);
+                readAll(showAllTasks, error);
             }, error);
         }
     }
@@ -52,18 +55,22 @@
         container.appendChild(containerOneTask);
     }
 
-    function showAllTask()
+    function showAllTasks()
     {
         document.getElementById('containerShowTask').innerHTML = '';
         readAll(function(text){
                     var colectionOfTask = JSON.parse(text);
+                    taskToDo = 0;
                     for( var i = 0 ; i < colectionOfTask.length ; i++)
                         {
                             showTask(colectionOfTask[i].task, colectionOfTask[i].status, colectionOfTask[i]._id);
+                            if(!(colectionOfTask[i].status))
+                            {
+                                taskToDo++;
+                            }
                         }
                         showBottomContainer();
-                }, error);
-       
+                }, error);       
     }
     
     function showBottomContainer()
@@ -74,28 +81,34 @@
             containerBottom.setAttribute('data-id',0);
             containerBottom.className="containerOneTask";
 
-        var countOfTask = document.createElement('div');
-            countOfTask.setAttribute('data-id',0);
-            countOfTask.className = 'showCountOfTask';
-            countOfTask.appendChild(document.createTextNode('Task to do: '+ 12));
+        var countOfTasks = document.createElement('div');
+            countOfTasks.setAttribute('data-id',0);
+            countOfTasks.className = 'showCountOfTask';
+            countOfTasks.appendChild(document.createTextNode('Task to do: '+ taskToDo));
 
         var active=document.createElement('button');
             active.setAttribute('data-id',0);
             active.className = "buttomFilter";
-            active.addEventListener('click', active, false);
+            active.addEventListener('click', activeTasks, false);
             active.appendChild(document.createTextNode('Active'));
 
         var copleted=document.createElement('button');
             copleted.setAttribute('data-id',0);
             copleted.className = "buttomFilter";
-            copleted.addEventListener('click', completed, false);
+            copleted.addEventListener('click', completedTasks, false);
             copleted.appendChild(document.createTextNode('Copleted'));
 
-        containerBottom.appendChild(countOfTask);
+        var all=document.createElement('button');
+            all.setAttribute('data-id',0);
+            all.className = "buttomFilter";
+            all.addEventListener('click', showAllTasks, false);
+            all.appendChild(document.createTextNode('All'));
+
+        containerBottom.appendChild(countOfTasks);
+        containerBottom.appendChild(all);
         containerBottom.appendChild(active);
         containerBottom.appendChild(copleted);
         container.appendChild(containerBottom);
-
     }
 
     function mark(e)
@@ -105,28 +118,82 @@
         {
             status = true;
         }
-        updataById({status : status}, showAllTask, error, e.target.getAttribute('data-id'));
+        updataById({status : status}, showAllTasks, error, e.target.getAttribute('data-id'));
     }
 
     function remove(e)
     {
-        removeById(showAllTask, error, e.target.getAttribute('data-id'));
+        removeById(showAllTasks, error, e.target.getAttribute('data-id'));
     }
 
-    function active()
+    function activeTasks()
     {
+        document.getElementById('containerShowTask').innerHTML = '';
 
+        readAll(function(text){
+                    var colectionOfTask = JSON.parse(text);
+                    taskToDo = 0;
+                    for( var i = 0 ; i < colectionOfTask.length ; i++)
+                        {
+                            if(!(colectionOfTask[i].status))
+                            {
+                                showTask(colectionOfTask[i].task, colectionOfTask[i].status, colectionOfTask[i]._id);
+                                taskToDo++;
+                            }
+                        }
+                        showBottomContainer();
+                }, error);
     }
 
-    function completed()
+    function completedTasks()
     {
-        
+        document.getElementById('containerShowTask').innerHTML = '';
+        readAll(function(text){
+                    var colectionOfTask = JSON.parse(text);
+                    taskToDo = 0;
+                    for( var i = 0 ; i < colectionOfTask.length ; i++)
+                        {
+                            if(colectionOfTask[i].status)
+                            {
+                                showTask(colectionOfTask[i].task, colectionOfTask[i].status, colectionOfTask[i]._id);
+                            }
+                            if(!(colectionOfTask[i].status))
+                            {
+                                taskToDo++;
+                            }
+                        }
+                        showBottomContainer();
+                }, error);
+    }
+
+    function checkAll(e)
+    {
+        var status = false;
+        if(e.target.checked)
+        {
+           var status = true;
+        }
+        else
+        {
+            var status = false;
+        }
+        readAll(function(text){
+                var colectionOfTask = JSON.parse(text);
+                taskToDo = 0;
+                console.log(colectionOfTask);
+                for( var i = 0 ; i < colectionOfTask.length ; i++)
+                {
+                    updataById({status : status}, function(){}, error, colectionOfTask[i]._id);
+                }       
+            }, error); 
+            showAllTasks();
     }
 
     function init()
     {
-        document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false)
-        showAllTask();
+        document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false);
+        document.getElementById('checkAll').addEventListener('click', checkAll, false);
+        showAllTasks();
     }
     window.ifPressEnter = ifPressEnter;
     window.init = init;
