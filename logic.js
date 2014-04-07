@@ -27,10 +27,24 @@
         xhr.onreadystatechange = function() {             
          		if (xhr.readyState === 4 )  
          	    {
-                    callback(xhr.responseText);
+                    if(typeof(callback) === 'function')
+                    {
+                        callback(xhr.responseText);
+                    }
+                    else
+                    {
+                        console.log(callback + 'is not a function.')
+                    }
          	        if(xhr.status != 200)
          	        {
-         	            callbackError(xhr.statusText);
+                        if(typeof(callbackError) === 'function')
+         	            {
+                            callbackError(xhr.statusText);
+                        }
+                        else
+                        {
+                            console.log(callbackError + 'is not a function.')
+                        }
          	        }
          	    }  
             }
@@ -53,15 +67,14 @@
     * @param {Function} callbackError. Function which will run if will be some errors.
     * @param {Number} id. Id of task.
     */
-	function readById(callback, callbackError, id)
+	function readById(id, callback, callbackError)
 	{
 		reqRes('http://localhost:3000/task/' + id, callback, callbackError);
-	}
-
+    }
     /**
     * Sends a request to the server to create a task.
-    * @param {Object} task. Id of task. It contains properties task{string}(that you want to do) and
-    * status{Boolean}(Status of task).
+    * @param {Object} task. It contains properties task{string}(that you want to do) and
+    *                 status{Boolean}(Status of task) and _id{number}(id of task).
     * @param {Function} callback. Function which will run after receiving data.
     * @param {Function} callbackError. Function which will run if will be some errors.
     */
@@ -72,26 +85,26 @@
 
     /**
     * Sends a request to the server for updatas task by id.
-    * @param {Object} task. Id of task. It contains properties task{string}(that you want to do) and
-    * status{Boolean}(Status of task).
+   * @param {Object} task. It contains properties task{string}(that you want to do) and
+    *                 status{Boolean}(Status of task) and _id{number}(id of task).
     * @param {Function} callback. Function which will run after receiving data.
     * @param {Function} callbackError. Function which will run if will be some errors.
-    * @param {Number} id. Id of task.
     */
-	function updataById(task, callback, callbackError, id)
+	function updataById(task, callback, callbackError)
 	{
-		reqRes('http://localhost:3000/task/'+id, callback, callbackError, {method : 'PUT', data : JSON.stringify(task)});
+		reqRes('http://localhost:3000/task/'+task._id, callback, callbackError, {method : 'PUT', data : JSON.stringify(task)});
 	}
 
     /**
     * Sends a request to the server for delete task by id
+    * @param {Object} task. It contains properties task{string}(that you want to do) and
+    *                 status{Boolean}(Status of task) and _id{number}(id of task).
     * @param {Function} callback. Function which will run after receiving data.
     * @param {Function} callbackError. Function which will run if will be some errors.
-    * @param {Number} id. Id of task.
     */
-	function removeById(callback, callbackError, id)
+	function removeById(task, callback, callbackError)
 	{
-		reqRes('http://localhost:3000/task/'+id, callback, callbackError, {method: 'DELETE', data : null});
+		reqRes('http://localhost:3000/task/'+task._id, callback, callbackError, {method: 'DELETE', data : null});
 	}
 
 	/**
