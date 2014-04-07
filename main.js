@@ -190,8 +190,7 @@
                 taskToDo = 0;
                 for( var i = 0 ; i < collectionOfTask.length ; i++)
                 {
-                    var id = collectionOfTask[i]._id;
-                    updataById({status:status, _id:id}, displayAll, error);
+                    updataById({status:status, _id:collectionOfTask[i]._id}, displayAll, error);
                 }       
             }, error); 
            
