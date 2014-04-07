@@ -1,12 +1,24 @@
 (function()
 {
+    /**
+    * Variable that stores the number of tasks to perform
+    */  
     var taskToDo = 0;
 
+
+    /**
+    * Called in case of error during request to the server.
+    * @param {String} text. String for disply.
+    */   
     function error(text)
     {
         console.log('Error is :' + text);
     }
 
+    /**
+    * Called by pressing Enter and creates a new task on a server.
+    * @param {Event} e.
+    */ 
     function ifPressEnter(e)
     {
         if (e.keyCode === 13)
@@ -17,6 +29,12 @@
         }
     }
 
+    /**
+    * Shows the task by creating all html elements
+    * @param {String} url. Adres of file which contains data.
+    * @param {Boolean} status. Adres of file which contains data.
+    * @param {Number} id. Adres of file which contains data.
+    */  
     function showTask(text,status,id)
     {
         var container= document.getElementById('containerShowTask');
@@ -55,6 +73,9 @@
         container.appendChild(containerOneTask);
     }
 
+    /**
+    * Shows all task
+    */ 
     function showAllTasks()
     {
         document.getElementById('containerShowTask').innerHTML = '';
@@ -73,6 +94,9 @@
                 }, error);       
     }
     
+    /**
+    * Shows container which contains button for filtering. 
+    */ 
     function showBottomContainer()
     {
         var container= document.getElementById('containerShowTask');
@@ -111,6 +135,10 @@
         container.appendChild(containerBottom);
     }
 
+    /**
+    * Changing status of task  and display it
+    * @param {Event} e.
+    */ 
     function mark(e)
     {
         var status = false;
@@ -121,11 +149,18 @@
         updataById({status : status}, showAllTasks, error, e.target.getAttribute('data-id'));
     }
 
+    /**
+    * Delete task by id.
+    * @param {Event} e.
+    */
     function remove(e)
     {
         removeById(showAllTasks, error, e.target.getAttribute('data-id'));
     }
 
+    /**
+    * Disply all active task
+    */
     function activeTasks()
     {
         document.getElementById('containerShowTask').innerHTML = '';
@@ -138,13 +173,14 @@
                             if(!(colectionOfTask[i].status))
                             {
                                 showTask(colectionOfTask[i].task, colectionOfTask[i].status, colectionOfTask[i]._id);
-                                taskToDo++;
                             }
                         }
                         showBottomContainer();
                 }, error);
     }
-
+    /**
+    * Disply completed  task
+    */
     function completedTasks()
     {
         document.getElementById('containerShowTask').innerHTML = '';
@@ -157,25 +193,21 @@
                             {
                                 showTask(colectionOfTask[i].task, colectionOfTask[i].status, colectionOfTask[i]._id);
                             }
-                            if(!(colectionOfTask[i].status))
-                            {
-                                taskToDo++;
-                            }
                         }
                         showBottomContainer();
                 }, error);
     }
 
+    /**
+    * Changing status of all task and disply them.
+    * @param {Event} e.
+    */
     function checkAll(e)
     {
         var status = false;
         if(e.target.checked)
         {
            var status = true;
-        }
-        else
-        {
-            var status = false;
         }
         readAll(function(text){
                 var colectionOfTask = JSON.parse(text);
@@ -185,10 +217,14 @@
                 {
                     updataById({status : status}, function(){}, error, colectionOfTask[i]._id);
                 }       
+                showAllTasks();
             }, error); 
-            showAllTasks();
+           
     }
 
+    /**
+    * Function starts after load html document.
+    */
     function init()
     {
         document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false);
