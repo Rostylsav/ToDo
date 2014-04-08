@@ -7,20 +7,27 @@
         collection = [];
 
     /**
-    * Sats collection of task
-    */   
-    function setCollection()
-    {
-        readAll(function(text){collection = JSON.parse(text);},error);
-    }
-
-    /**
     * Called in case of error during request to the server.
     * @param {String} text. String for display.
     */   
     function error(text)
     {
         console.log('Error is :' + text);
+    }
+    /**
+    * Get elment from colection by id.
+    * @param {Array} array. Collection of task.
+    * @param {Number} id. Id for looking element.
+    */ 
+    function getTaskById(array, id)
+    {
+        for( var i = 0 ; i < array.length; i++)
+        { 
+            if(array[i]._id === id)
+            {
+                return array[i];
+            }
+        }
     }
 
     /**
@@ -29,7 +36,8 @@
     function displayAll()
     {
         readAll(function(text){
-                showAllTasks((JSON.parse(text)));
+                collection = JSON.parse(text);
+                showAllTasks(collection);
                 }, error); 
     }
 
@@ -68,6 +76,7 @@
         var div = document.createElement('div');
             div.setAttribute('data-id',task._id);
             div.className = 'showValueOfTask';
+            div.ondblclick = changeValue;
 
         var checkbox = document.createElement('input');
             checkbox.setAttribute('data-id',task._id);
@@ -138,7 +147,6 @@
         container.appendChild(containerBottom);
     }
 
-
     /**
     * Called by pressing Enter and creates a new task on a server.
     * @param {Event} e.
@@ -149,16 +157,16 @@
         {
             if(document.getElementById('enterTask').value !='')
             {
-                create({task: document.getElementById('enterTask').value, status: false}, displayAll, error);
-                setCollection();
+                create({task: document.getElementById('enterTask').value, status: false}, function(text){ 
+                        collection.push(JSON.parse(text));
+                        showAllTasks(collection);
+                    }, error);
             }
             else
             {
                 console.log('Error. task is not enter');
             }
         }
-
-        
     }
 
     /**
@@ -167,13 +175,26 @@
     */ 
     function mark(e)
     {
-        var status = false;
+        var isCheck = false;
         if(e.target.checked)
         {
-            status = true;
+            isCheck = true;
         }
-        updataById({status:status, _id:e.target.getAttribute('data-id')}, displayAll, error);
-        setCollection();
+        var obj = {
+            status: isCheck, 
+            _id:e.target.getAttribute('data-id')
+        }
+        updataById(obj, function(text){
+                    if(obj.hasOwnProperty('task'))
+                    {
+                        getTaskById(collection, e.target.getAttribute('data-id')).task = JSON.parse(text).task;
+                    }
+                    if(obj.hasOwnProperty('status'))
+                    {
+                        getTaskById(collection, e.target.getAttribute('data-id')).status = JSON.parse(text).status;
+                    }
+                    showAllTasks(collection);
+                }, error);
     }
 
     /**
@@ -182,8 +203,16 @@
     */
     function remove(e)
     {
-        removeById({_id:e.target.getAttribute('data-id')}, displayAll, error);
-        setCollection();
+        removeById({_id:e.target.getAttribute('data-id')}, function(){
+                    for( var i = 0 ; i < collection.length; i++)
+                    { 
+                        if(collection[i]._id === e.target.getAttribute('data-id'))
+                        {
+                            collection.splice(i, 1);
+                        }
+                    }
+                    showAllTasks(collection);
+        }, error);
     }
 
 
@@ -201,9 +230,9 @@
         }
         for( var i = 0 ; i < collection.length ; i++)
         {
-            updataById({status:status, _id:collection[i]._id}, displayAll, error);
+            updataById({status:status, _id:collection[i]._id}, function(){}, error);
         }       
-        setCollection();
+        displayAll();
     }
 
     /**
@@ -229,6 +258,16 @@
         showAllTasks(array);
     }
 
+
+
+
+    function changeValue(e)
+    {
+        var id = e.target.getAttribute('data-id');
+        var task = document.getElementById(id).value;
+        console.log(task);
+    }
+
     /**
     * Function starts after load html document.
     */
@@ -237,7 +276,6 @@
         document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false);
         document.getElementById('checkAll').addEventListener('click', checkAll, false);
         displayAll();
-        setCollection();
     }
     window.ifPressEnter = ifPressEnter;
     window.init = init;

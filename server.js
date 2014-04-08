@@ -52,10 +52,23 @@ server.post('/task', function (req, res, next) {
 * Updata status of  task by id
 */
 server.put('/task/:id', function (req, res, next) {
-  taskSave.update({_id: req.params.id, status: req.params.status }, function (error, task) {
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-    res.send(200)
-  })
+    for( item in req.context)
+    {
+        if(item == 'task')
+        {
+            taskSave.update({_id: req.params.id, task: req.params.task }, function (error, task) {
+            if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+            res.send(200, task)
+            });
+        }
+        if(item == 'status')
+        {
+            taskSave.update({_id: req.params.id, status: req.params.status }, function (error, task) {
+            if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+            res.send(200, task)
+            });
+        }
+    }
 });
 
 

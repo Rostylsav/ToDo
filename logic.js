@@ -27,15 +27,18 @@
         xhr.onreadystatechange = function() {             
          		if (xhr.readyState === 4 )  
          	    {
-                    if(typeof(callback) === 'function')
+                    if(xhr.status === 200 || xhr.status === 201)
                     {
-                        callback(xhr.responseText);
+                        if(typeof(callback) === 'function')
+                        {
+                            callback(xhr.responseText);
+                        }
+                        else
+                        {
+                            console.log(callback + 'is not a function.')
+                        }
                     }
-                    else
-                    {
-                        console.log(callback + 'is not a function.')
-                    }
-         	        if(xhr.status != 200)
+         	        else
          	        {
                         if(typeof(callbackError) === 'function')
          	            {
