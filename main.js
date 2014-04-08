@@ -31,6 +31,26 @@
     }
 
     /**
+    * Changing value and status of task
+    * @param {Object} obj. Object with parameters task (new value of task) and status(new status of task).
+    * @param {Event} e. 
+    */ 
+    function chageTask(obj, e)
+    {
+        updataById(obj, function(text){
+                    if(obj.hasOwnProperty('task'))
+                    {
+                        getTaskById(collection, e.target.getAttribute('data-id')).task = JSON.parse(text).task;
+                    }
+                    if(obj.hasOwnProperty('status'))
+                    {
+                        getTaskById(collection, e.target.getAttribute('data-id')).status = JSON.parse(text).status;
+                    }
+                    showAllTasks(collection);
+                }, error);
+    }
+
+    /**
     * Display all task.
     */ 
     function displayAll()
@@ -180,21 +200,7 @@
         {
             isCheck = true;
         }
-        var obj = {
-            status: isCheck, 
-            _id:e.target.getAttribute('data-id')
-        }
-        updataById(obj, function(text){
-                    if(obj.hasOwnProperty('task'))
-                    {
-                        getTaskById(collection, e.target.getAttribute('data-id')).task = JSON.parse(text).task;
-                    }
-                    if(obj.hasOwnProperty('status'))
-                    {
-                        getTaskById(collection, e.target.getAttribute('data-id')).status = JSON.parse(text).status;
-                    }
-                    showAllTasks(collection);
-                }, error);
+        chageTask({status: isCheck, _id:e.target.getAttribute('data-id')}, e);
     }
 
     /**
@@ -258,14 +264,33 @@
         showAllTasks(array);
     }
 
-
-
-
-    function changeValue(e)
+    /**
+    * Changing html element div to input for changing value of target task 
+    * @param {Event} e.
+    */
+    function changeDivToInput(e)
     {
-        var id = e.target.getAttribute('data-id');
-        var task = document.getElementById(id).value;
-        console.log(task);
+        var inputbox = document.createElement('input');
+            inputbox.setAttribute('data-id', e.target.getAttribute('data-id'));
+            inputbox.className = 'inputbox';
+            inputbox.type = 'text';
+            inputbox.value = e.target.innerHTML;
+            e.target.innerHTML = '';
+            inputbox.addEventListener("keypress", change, false);
+        e.target.appendChild(inputbox);
+    }
+
+    /**
+    * Changing value of task on new value
+    * @param {Event} e.
+    */
+    function change(e)
+    {
+        if (e.keyCode === 13)
+        {
+            chageTask({task: e.target.value, _id:e.target.getAttribute('data-id')}, e);
+            showAllTasks(collection);
+        }
     }
 
     /**
