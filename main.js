@@ -3,7 +3,17 @@
     /**
     * Variable that stores the number of tasks to perform
     */  
-    var taskToDo = 0;
+    var taskToDo = 0,
+        collection = [];
+
+    /**
+    * Sats collection of task
+    */   
+    function setCollection()
+    {
+        readAll(function(text){collection = JSON.parse(text);},error);
+    }
+
     /**
     * Called in case of error during request to the server.
     * @param {String} text. String for display.
@@ -13,12 +23,13 @@
         console.log('Error is :' + text);
     }
 
-
+    /**
+    * Display all task.
+    */ 
     function displayAll()
     {
         readAll(function(text){
-                var collectionOfTask = JSON.parse(text);
-                showAllTasks(collectionOfTask);
+                showAllTasks((JSON.parse(text)));
                 }, error); 
     }
 
@@ -85,7 +96,7 @@
     }
 
     /**
-    * Shows container which contains button for filtering. 
+    * Shows container which contains buttons for filtering. 
     */ 
     function showBottomContainer()
     {
@@ -101,16 +112,18 @@
             countOfTasks.appendChild(document.createTextNode('Task to do: '+ taskToDo));
 
         var active=document.createElement('button');
+            active.id = 'active';
             active.setAttribute('data-id',0);
             active.className = "buttomFilter";
-            active.addEventListener('click', activeTasks, false);
+            active.addEventListener('click', filter, false);
             active.appendChild(document.createTextNode('Active'));
 
-        var copleted=document.createElement('button');
-            copleted.setAttribute('data-id',0);
-            copleted.className = "buttomFilter";
-            copleted.addEventListener('click', completedTasks, false);
-            copleted.appendChild(document.createTextNode('Copleted'));
+        var completed=document.createElement('button');
+            completed.id = 'completed';
+            completed.setAttribute('data-id',0);
+            completed.className = "buttomFilter";
+            completed.addEventListener('click', filter, false);
+            completed.appendChild(document.createTextNode('Completed'));
 
         var all=document.createElement('button');
             all.setAttribute('data-id',0);
@@ -121,7 +134,7 @@
         containerBottom.appendChild(countOfTasks);
         containerBottom.appendChild(all);
         containerBottom.appendChild(active);
-        containerBottom.appendChild(copleted);
+        containerBottom.appendChild(completed);
         container.appendChild(containerBottom);
     }
 
@@ -134,12 +147,24 @@
     {
         if (e.keyCode === 13)
         {
-            create({ task: document.getElementById('enterTask').value, status: false}, function(){
-                    displayAll();
-            }, error);
+            if(document.getElementById('enterTask').value !='')
+            {
+                create({task: document.getElementById('enterTask').value, status: false}, displayAll, error);
+                setCollection();
+            }
+            else
+            {
+                console.log('Error. task is not enter');
+            }
         }
+
+        
     }
 
+    /**
+    * Changing status and css style of task.
+    * @param {Event} e.
+    */ 
     function mark(e)
     {
         var status = false;
@@ -148,6 +173,7 @@
             status = true;
         }
         updataById({status:status, _id:e.target.getAttribute('data-id')}, displayAll, error);
+        setCollection();
     }
 
     /**
@@ -157,22 +183,9 @@
     function remove(e)
     {
         removeById({_id:e.target.getAttribute('data-id')}, displayAll, error);
+        setCollection();
     }
 
-    /**
-    * Display all active task
-    */
-    function activeTasks()
-    {
-
-    }
-    /**
-    * Display completed  task
-    */
-    function completedTasks()
-    {
-
-    }
 
     /**
     * Changing status of all task and display them.
@@ -184,17 +197,38 @@
         if(e.target.checked)
         {
            var status = true;
+           taskToDo = 0;
         }
-        readAll(function(text){
-                var collectionOfTask = JSON.parse(text);
-                taskToDo = 0;
-                for( var i = 0 ; i < collectionOfTask.length ; i++)
-                {
-                    updataById({status:status, _id:collectionOfTask[i]._id}, displayAll, error);
-                }       
-            }, error); 
-           
+        for( var i = 0 ; i < collection.length ; i++)
+        {
+            updataById({status:status, _id:collection[i]._id}, displayAll, error);
+        }       
+        setCollection();
     }
+
+    /**
+    * filters adn displays collection of task by status
+    * @param {Event} e.
+    */
+    function filter(e)
+    {
+        var array = [],
+            status = true;
+
+        if(e.target.id === 'active')
+        {
+            status = false;
+        }
+        for (var i = 0; i < collection.length; i++)
+        {
+            if(collection[i].status == status)
+            {
+                array.push(collection[i]);
+            }
+        }
+        showAllTasks(array);
+    }
+
     /**
     * Function starts after load html document.
     */
@@ -203,6 +237,7 @@
         document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false);
         document.getElementById('checkAll').addEventListener('click', checkAll, false);
         displayAll();
+        setCollection();
     }
     window.ifPressEnter = ifPressEnter;
     window.init = init;
