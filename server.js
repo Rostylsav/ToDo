@@ -42,45 +42,34 @@ server.get('/task/:id', function (req, res, next) {
 * Creates a new task with paramenters task, name, _id
 */
 server.post('/task', function (req, res, next) {    
-  taskSave.create({ task: req.params.task , status: req.params.status }, function (error, task) {
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-    res.send(201, task)
-  })
+    taskSave.create(req.params, function (error, task) {
+        if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+        res.send(201, task)
+    })
 });
 
 /**
 * Updata status of  task by id
 */
-server.put('/task/:id', function (req, res, next) {
-    for( item in req.context)
-    {
-        if(item == 'task')
-        {
-            taskSave.update({_id: req.params.id, task: req.params.task }, function (error, task) {
-            if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-            res.send(200, task)
-            });
-        }
-        if(item == 'status')
-        {
-            taskSave.update({_id: req.params.id, status: req.params.status }, function (error, task) {
-            if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-            res.send(200, task)
-            });
-        }
-    }
-});
-
-
-server.del('/task/:id', function (req, res, next) {
-  taskSave.delete(req.params.id, function (error, task) {
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-    res.send()
-  })
+server.put('/task', function (req, res, next) {
+    taskSave.update( req.params, function (error, task) {
+            if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)));
+            res.send(200, task);
+    });
 });
 
 /**
 *Delete  task by id
+*/
+server.del('/task', function (req, res, next) {
+    taskSave.delete( req.params._id, function (error, task) {
+        if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+        res.send()
+      })
+});
+
+/**
+*Get all fikes.
 */
 app.use(express.static(__dirname));
 

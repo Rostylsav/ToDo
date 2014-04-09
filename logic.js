@@ -18,11 +18,10 @@
      	xhr.open(method, url, true);
      	if(options.data)
      	{
-     		if(method ==='PUT' || method === 'POST')
-     		{
-     			xhr.setRequestHeader('Content-Type', 'application/json');
-     		    data = options.data;
-     		}
+           
+                xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            data = options.data;
      	}
         xhr.onreadystatechange = function() {             
          		if (xhr.readyState === 4 )  
@@ -51,6 +50,7 @@
          	        }
          	    }  
             }
+           // console.log('data = ' + data);
         xhr.send(data);
     } 
 
@@ -95,7 +95,7 @@
     */
 	function updataById(task, callback, callbackError)
 	{
-		reqRes('http://localhost:3000/task/'+task._id, callback, callbackError, {method : 'PUT', data : JSON.stringify(task)});
+		reqRes('http://localhost:3000/task', callback, callbackError, {method : 'PUT', data : JSON.stringify(task)});
 	}
 
     /**
@@ -107,7 +107,7 @@
     */
 	function removeById(task, callback, callbackError)
 	{
-		reqRes('http://localhost:3000/task/'+task._id, callback, callbackError, {method: 'DELETE', data : null});
+		reqRes('http://localhost:3000/task', callback, callbackError, {method: 'DELETE', data : JSON.stringify(task)});
 	}
 
 	/**

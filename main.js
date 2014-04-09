@@ -4,7 +4,9 @@
     * Variable that stores the number of tasks to perform
     */  
     var taskToDo = 0,
-        collection = [];
+        collection = [],
+        text = '',
+        chageValue = true;
 
     /**
     * Called in case of error during request to the server.
@@ -96,7 +98,7 @@
         var div = document.createElement('div');
             div.setAttribute('data-id',task._id);
             div.className = 'showValueOfTask';
-            div.ondblclick = changeValue;
+            div.ondblclick = changeDivToInput;
 
         var checkbox = document.createElement('input');
             checkbox.setAttribute('data-id',task._id);
@@ -209,7 +211,7 @@
     */
     function remove(e)
     {
-        removeById({_id:e.target.getAttribute('data-id')}, function(){
+        removeById(getTaskById(collection, e.target.getAttribute('data-id')), function(){
                     for( var i = 0 ; i < collection.length; i++)
                     { 
                         if(collection[i]._id === e.target.getAttribute('data-id'))
@@ -270,14 +272,21 @@
     */
     function changeDivToInput(e)
     {
-        var inputbox = document.createElement('input');
+        if(chageValue)
+        {
+            var inputbox = document.createElement('input');
             inputbox.setAttribute('data-id', e.target.getAttribute('data-id'));
             inputbox.className = 'inputbox';
             inputbox.type = 'text';
             inputbox.value = e.target.innerHTML;
+            text = e.target.innerHTML;
             e.target.innerHTML = '';
             inputbox.addEventListener("keypress", change, false);
-        e.target.appendChild(inputbox);
+            e.target.appendChild(inputbox);
+            inputbox.focus();
+            inputbox.select();
+            chageValue = false;
+        }
     }
 
     /**
@@ -285,11 +294,17 @@
     * @param {Event} e.
     */
     function change(e)
-    {
+    {   
         if (e.keyCode === 13)
         {
             chageTask({task: e.target.value, _id:e.target.getAttribute('data-id')}, e);
             showAllTasks(collection);
+            chageValue = true;
+        }
+        if(e.keyCode === 27)
+        {
+            chageTask({task: text, _id:e.target.getAttribute('data-id')}, e);
+            chageValue = true;
         }
     }
 
