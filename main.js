@@ -4,9 +4,8 @@
     * Variable that stores the number of tasks to perform
     */  
     var taskToDo = 0,
-        collection = [],
-        text = '',
-        chageValue = true;
+        collection = [], 
+        htmlElement ;
 
     /**
     * Called in case of error during request to the server.
@@ -16,72 +15,7 @@
     {
         console.log('Error is :' + text);
     }
-    /**
-    * Get elment from colection by id.
-    * @param {Array} array. Collection of task.
-    * @param {Number} id. Id for looking element.
-    */ 
-    function getTaskById(array, id)
-    {
-        for( var i = 0 ; i < array.length; i++)
-        { 
-            if(array[i]._id === id)
-            {
-                return array[i];
-            }
-        }
-    }
-
-    /**
-    * Changing value and status of task
-    * @param {Object} obj. Object with parameters task (new value of task) and status(new status of task).
-    * @param {Event} e. 
-    */ 
-    function chageTask(obj, e)
-    {
-        updataById(obj, function(text){
-                    if(obj.hasOwnProperty('task'))
-                    {
-                        getTaskById(collection, e.target.getAttribute('data-id')).task = JSON.parse(text).task;
-                    }
-                    if(obj.hasOwnProperty('status'))
-                    {
-                        getTaskById(collection, e.target.getAttribute('data-id')).status = JSON.parse(text).status;
-                    }
-                    showAllTasks(collection);
-                }, error);
-    }
-
-    /**
-    * Display all task.
-    */ 
-    function displayAll()
-    {
-        readAll(function(text){
-                collection = JSON.parse(text);
-                showAllTasks(collection);
-                }, error); 
-    }
-
-    /**
-    * Shows all task
-    * @param {Array} array. Collection of task for display.
-    */ 
-    function showAllTasks(array)
-    {
-        document.getElementById('containerShowTask').innerHTML = '';
-        taskToDo = 0;
-        for( var i = 0 ; i < array.length ; i++)
-        {
-            showTask(array[i]);
-            if(!(array[i].status))
-            {
-                taskToDo++;
-            }
-        }
-        showBottomContainer();     
-    }
-
+   
     /**
     * Shows the task by creating all html elements
     * @param {Object} task. It contains properties task{string}(that you want to do) and
@@ -131,35 +65,37 @@
     */ 
     function showBottomContainer()
     {
-        var container= document.getElementById('containerShowTask');
+        var container = document.getElementById('bottomContainer');
+        container.innerHTML = '';
 
         var containerBottom = document.createElement('div');
             containerBottom.setAttribute('data-id',0);
-            containerBottom.className="containerOneTask";
+            containerBottom.className = "containerOneTask";
 
         var countOfTasks = document.createElement('div');
             countOfTasks.setAttribute('data-id',0);
             countOfTasks.className = 'showCountOfTask';
             countOfTasks.appendChild(document.createTextNode('Task to do: '+ taskToDo));
 
-        var active=document.createElement('button');
+        var active = document.createElement('button');
             active.id = 'active';
             active.setAttribute('data-id',0);
             active.className = "buttomFilter";
             active.addEventListener('click', filter, false);
             active.appendChild(document.createTextNode('Active'));
 
-        var completed=document.createElement('button');
+        var completed = document.createElement('button');
             completed.id = 'completed';
             completed.setAttribute('data-id',0);
             completed.className = "buttomFilter";
             completed.addEventListener('click', filter, false);
             completed.appendChild(document.createTextNode('Completed'));
 
-        var all=document.createElement('button');
+        var all = document.createElement('button');
             all.setAttribute('data-id',0);
+            all.id = 'all';
             all.className = "buttomFilter";
-            all.addEventListener('click', displayAll, false);
+            all.addEventListener('click', filter, false);
             all.appendChild(document.createTextNode('All'));
 
         containerBottom.appendChild(countOfTasks);
@@ -170,10 +106,136 @@
     }
 
     /**
-    * Called by pressing Enter and creates a new task on a server.
+    * Shows all task
+    * @param {Array} array. Collection of task for display.
+    */ 
+    function showAllTasks(array)
+    {
+        document.getElementById('containerShowTask').innerHTML = '';
+        taskToDo = 0;
+        for( var i = 0 ; i < array.length ; i++)
+        {
+            showTask(array[i]);
+            if(!(array[i].status))
+            {
+                taskToDo++;
+            }
+        }
+
+    }
+
+    /**
+    * Display all task.
+    */ 
+    function displayAll()
+    {
+        readAll(function(text){
+            collection = JSON.parse(text);
+            showAllTasks(collection);
+            showBottomContainer();     
+        }, error); 
+    }
+    /**
+    * Redisplay task which was modefyed
+    * @param {Object} task. It contains properties task{string}(that you want to do) and
+    *                 status{Boolean}(status of task) and _id{number}(id of task).
+    * @param {Html} elem. Html elememt which will redisply.
+    */
+    function reDisplay(obj, elem)
+    {
+
+        elem.innerHTML = '';
+        var div = document.createElement('div');
+            div.setAttribute('data-id',obj._id);
+            div.className = 'showValueOfTask';
+            div.ondblclick = changeDivToInput;
+
+        var checkbox = document.createElement('input');
+            checkbox.setAttribute('data-id',obj._id);
+            checkbox.className = 'checkbox';
+            checkbox.type = 'checkbox';
+            checkbox.checked = obj.status;
+            if(obj.status == true)
+            {
+                div.className = "showValueOfCheckedTask";
+            }
+            checkbox.addEventListener("click", mark, false);
+
+        var button=document.createElement('button');
+            button.setAttribute('data-id',obj._id);
+            button.className = "button";
+            button.addEventListener('click',remove, false);
+
+        button.appendChild(document.createTextNode('R'));
+        div.appendChild(document.createTextNode(obj.task));
+
+        elem.appendChild(checkbox);
+        elem.appendChild(div);
+        elem.appendChild(button);
+    }
+
+    /**
+    * Change task in collection .
+    * @param {Object} element. New element for changin.
+    */ 
+    function changeInCollection(element)
+    {
+        for( var i = 0 ; i < collection.length; i++)
+        { 
+            if(collection[i]._id === element._id)
+            {
+                collection[i] = element;
+            }
+        }
+    }
+
+    /**
+    * Delete task in collection .
+    * @param {Number} id. d of task which was delete.
+    */ 
+    function deleteInCollection(id)
+    {
+        for( var i = 0 ; i < collection.length; i++)
+            { 
+                if(collection[i]._id === id)
+                {
+                    collection.splice(i, 1);
+                }
+            }
+    } 
+
+    /**
+    * Get task from collection by id .
+    * @param {Number} id. Id of task.
+    */ 
+    function getTaskById(id)
+    {
+         for( var i = 0 ; i < collection.length; i++)
+        { 
+            if(collection[i]._id === id)
+            {
+               return collection[i];
+            }
+        }
+    }
+    /**
+    * Changing task in collection and et server and redisplay it.
+    * @param {Object} obj. Object with parameters task (new value of task) and status(new status of task).
+    * @param {Html} elem. Html element for redisplay. 
+    */ 
+    function changeTask(obj, elem)
+    {
+        updataById(obj, function(text){
+            changeInCollection(JSON.parse(text));
+            reDisplay(JSON.parse(text), elem);
+        }, error);
+    }
+
+    /**
+    * Creates a new task.
     * @param {Event} e.
     */ 
-    function ifPressEnter(e)
+    function createTask(e)
     {
         if (e.keyCode === 13)
         {
@@ -181,7 +243,7 @@
             {
                 create({task: document.getElementById('enterTask').value, status: false}, function(text){ 
                         collection.push(JSON.parse(text));
-                        showAllTasks(collection);
+                        showTask(JSON.parse(text));
                     }, error);
             }
             else
@@ -202,7 +264,7 @@
         {
             isCheck = true;
         }
-        chageTask({status: isCheck, _id:e.target.getAttribute('data-id')}, e);
+        changeTask({status: isCheck, _id:e.target.getAttribute('data-id')}, e.target.parentNode);
     }
 
     /**
@@ -211,15 +273,9 @@
     */
     function remove(e)
     {
-        removeById(getTaskById(collection, e.target.getAttribute('data-id')), function(){
-                    for( var i = 0 ; i < collection.length; i++)
-                    { 
-                        if(collection[i]._id === e.target.getAttribute('data-id'))
-                        {
-                            collection.splice(i, 1);
-                        }
-                    }
-                    showAllTasks(collection);
+        removeById({_id: e.target.getAttribute('data-id')}, function(){
+            deleteInCollection(e.target.getAttribute('data-id'));
+            e.target.parentNode.style.display = 'none';
         }, error);
     }
 
@@ -239,8 +295,11 @@
         for( var i = 0 ; i < collection.length ; i++)
         {
             updataById({status:status, _id:collection[i]._id}, function(){}, error);
+            collection[i].status = status;
         }       
-        displayAll();
+        showAllTasks(collection);
+        showBottomContainer();
+
     }
 
     /**
@@ -255,15 +314,21 @@
         if(e.target.id === 'active')
         {
             status = false;
-        }
+        }    
         for (var i = 0; i < collection.length; i++)
         {
-            if(collection[i].status == status)
+            if(collection[i].status === status)
             {
                 array.push(collection[i]);
             }
         }
         showAllTasks(array);
+
+        if(e.target.id === 'all')
+        {
+            showAllTasks(collection);
+        }
+
     }
 
     /**
@@ -272,39 +337,37 @@
     */
     function changeDivToInput(e)
     {
-        if(chageValue)
+        if(htmlElement)
         {
-            var inputbox = document.createElement('input');
-            inputbox.setAttribute('data-id', e.target.getAttribute('data-id'));
-            inputbox.className = 'inputbox';
-            inputbox.type = 'text';
-            inputbox.value = e.target.innerHTML;
-            text = e.target.innerHTML;
-            e.target.innerHTML = '';
-            inputbox.addEventListener("keypress", change, false);
-            e.target.appendChild(inputbox);
-            inputbox.focus();
-            inputbox.select();
-            chageValue = false;
+            reDisplay(getTaskById(htmlElement.getAttribute('data-id')), htmlElement);
         }
+        var inputbox = document.createElement('input');
+        inputbox.id = e.target.getAttribute('data-id');
+        inputbox.className = 'inputbox';
+        inputbox.type = 'text';
+        inputbox.value = e.target.innerHTML;
+        e.target.innerHTML = '';
+        inputbox.addEventListener("keydown", change, false);
+        e.target.appendChild(inputbox);
+        inputbox.focus();
+        inputbox.select();
+        htmlElement = e.target.parentNode;
+
     }
 
     /**
-    * Changing value of task on new value
+    * Changing value of task on new value.
     * @param {Event} e.
     */
     function change(e)
     {   
         if (e.keyCode === 13)
         {
-            chageTask({task: e.target.value, _id:e.target.getAttribute('data-id')}, e);
-            showAllTasks(collection);
-            chageValue = true;
+            changeTask({task: e.target.value, _id:e.target.id}, (e.target.parentNode).parentNode);
         }
         if(e.keyCode === 27)
         {
-            chageTask({task: text, _id:e.target.getAttribute('data-id')}, e);
-            chageValue = true;
+           reDisplay(getTaskById(e.target.id), (e.target.parentNode).parentNode);
         }
     }
 
@@ -313,10 +376,10 @@
     */
     function init()
     {
-        document.getElementById('enterTask').addEventListener('keypress',ifPressEnter,false);
+        document.getElementById('enterTask').addEventListener('keypress',createTask,false);
         document.getElementById('checkAll').addEventListener('click', checkAll, false);
         displayAll();
     }
-    window.ifPressEnter = ifPressEnter;
+    window.createTask = createTask;
     window.init = init;
 })();

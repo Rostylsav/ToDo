@@ -45,15 +45,19 @@ input[type="checkbox"],input[type="text"] {
 	font-size: 23px;
 	padding-top: 23px;
 	color: #000;
-	width: 470px;
+	width: 380px;
+	margin-left: 80px;
+	overflow: auto;
 }
 
 .showValueOfCheckedTask{
 	font-size: 23px;
 	padding-top: 23px;
 	color: #DCDCDC;
-	width: 470px;
+	width: 380px;
 	text-decoration: line-through;
+	margin-left: 80px;
+	overflow: auto;
 }
 .showCountOfTask{
 	padding-top: 0px;
