@@ -1,17 +1,5 @@
 (function()
 {
-    function Task(url)
-    {
-        this.url = url;
-        this.collection = [];
-
-        this.load = function(callback){
-            reqRes(this.url, function(text){ 
-                this.collection = JSON.parse(text); 
-                callback(this.collection);
-            });
-        }
-    }
     /**
     * Variable that stores the number of tasks to perform
     */  
@@ -110,6 +98,17 @@
     }
 
     /**
+    * Display all task.
+    */ 
+    function displayAll()
+    {
+        readAll(function(text){
+            collection = JSON.parse(text);
+            showAllTasks(collection);
+            showBottomContainer();     
+        }, error); 
+    }
+    /**
     * showTaskInList task which was modefyed
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
@@ -156,7 +155,6 @@
     {
         for( var i = 0 ; i < collection.length; i++)
         { 
-            console.log(i);
             if(collection[i]._id === element._id)
             {
                 collection[i] = element;
@@ -206,7 +204,7 @@
     function changeTask(obj, elem)
     {
         updataById(obj, function(text){
-           // changeInCollection(JSON.parse(text));
+            changeInCollection(JSON.parse(text));
             showTaskInList(JSON.parse(text), elem);
         }, error);
     }
@@ -373,12 +371,7 @@
     {
         document.getElementById('enterTask').addEventListener('keypress',createTask,false);
         document.getElementById('checkAll').addEventListener('click', checkAll, false);
-
-        var collectionOfTask = new Task('http://localhost:3000/task');
-        collectionOfTask.load(function(data) {
-            showAllTasks(data);
-
-        });
+        displayAll();
     }
     window.init = init;
 })();
