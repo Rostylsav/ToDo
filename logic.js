@@ -118,4 +118,5 @@
 	window.create = create;
 	window.updataById = updataById;
 	window.removeById = removeById;
+    window.reqRes = reqRes;
 }())

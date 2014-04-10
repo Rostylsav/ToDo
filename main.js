@@ -5,7 +5,7 @@
     */  
     var taskToDo = 0,
         collection = [], 
-        htmlElement ;
+        ElementWhichUpdating ;
 
     /**
     * Called in case of error during request to the server.
@@ -25,39 +25,14 @@
     {
         var container= document.getElementById('containerShowTask');
 
-        var containerOneTask = document.createElement('div');
-            containerOneTask.setAttribute('data-id',task._id);
-            containerOneTask.className="containerOneTask";
+        var containerOfOneTask = document.createElement('div');
+            containerOfOneTask.setAttribute('data-id',task._id);
+            containerOfOneTask.className="containerOfOneTask";
 
-        var div = document.createElement('div');
-            div.setAttribute('data-id',task._id);
-            div.className = 'showValueOfTask';
-            div.ondblclick = changeDivToInput;
+        showTaskInList(task, containerOfOneTask);
 
-        var checkbox = document.createElement('input');
-            checkbox.setAttribute('data-id',task._id);
-            checkbox.className = 'checkbox';
-            checkbox.type = 'checkbox';
-            checkbox.checked = task.status;
-            if(task.status == true)
-            {
-                div.className = "showValueOfCheckedTask";
-            }
-            checkbox.addEventListener("click", mark, false);
-
-        var button=document.createElement('button');
-            button.setAttribute('data-id',task._id);
-            button.className = "button";
-            button.addEventListener('click',remove, false);
-
-        button.appendChild(document.createTextNode('R'));
-        div.appendChild(document.createTextNode(task.task));
         document.getElementById('enterTask').value=''; 
-
-        containerOneTask.appendChild(checkbox);
-        containerOneTask.appendChild(div);
-        containerOneTask.appendChild(button);
-        container.appendChild(containerOneTask);
+        container.appendChild(containerOfOneTask);
     }
 
     /**
@@ -70,11 +45,11 @@
 
         var containerBottom = document.createElement('div');
             containerBottom.setAttribute('data-id',0);
-            containerBottom.className = "containerOneTask";
+            containerBottom.className = "containerOfOneTask";
 
         var countOfTasks = document.createElement('div');
             countOfTasks.setAttribute('data-id',0);
-            countOfTasks.className = 'showCountOfTask';
+            countOfTasks.className = 'countOfTask';
             countOfTasks.appendChild(document.createTextNode('Task to do: '+ taskToDo));
 
         var active = document.createElement('button');
@@ -116,10 +91,8 @@
         for( var i = 0 ; i < array.length ; i++)
         {
             showTask(array[i]);
-            if(!(array[i].status))
-            {
-                taskToDo++;
-            }
+            if(array[i].status == false)
+            { taskToDo++;} 
         }
 
     }
@@ -136,12 +109,12 @@
         }, error); 
     }
     /**
-    * Redisplay task which was modefyed
+    * showTaskInList task which was modefyed
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     * @param {Html} elem. Html elememt which will redisply.
     */
-    function reDisplay(obj, elem)
+    function showTaskInList(obj, elem)
     {
 
         elem.innerHTML = '';
@@ -197,8 +170,13 @@
     {
         for( var i = 0 ; i < collection.length; i++)
             { 
+
                 if(collection[i]._id === id)
                 {
+                    if(!(collection[i].status))
+                    {
+                         taskToDo--;
+                    }
                     collection.splice(i, 1);
                 }
             }
@@ -219,15 +197,15 @@
         }
     }
     /**
-    * Changing task in collection and et server and redisplay it.
+    * Changing task in collection and et server and showTaskInList it.
     * @param {Object} obj. Object with parameters task (new value of task) and status(new status of task).
-    * @param {Html} elem. Html element for redisplay. 
+    * @param {Html} elem. Html element for showTaskInList. 
     */ 
     function changeTask(obj, elem)
     {
         updataById(obj, function(text){
             changeInCollection(JSON.parse(text));
-            reDisplay(JSON.parse(text), elem);
+            showTaskInList(JSON.parse(text), elem);
         }, error);
     }
 
@@ -237,13 +215,16 @@
     */ 
     function createTask(e)
     {
+        var elem = document.getElementById('enterTask').value;
         if (e.keyCode === 13)
         {
-            if(document.getElementById('enterTask').value !='')
+            if(elem !='')
             {
-                create({task: document.getElementById('enterTask').value, status: false}, function(text){ 
+                create({task: elem, status: false}, function(text){ 
                         collection.push(JSON.parse(text));
                         showTask(JSON.parse(text));
+                        taskToDo++;
+                        showBottomContainer();
                     }, error);
             }
             else
@@ -263,8 +244,14 @@
         if(e.target.checked)
         {
             isCheck = true;
+            taskToDo--;
+        }
+        else
+        {
+            taskToDo++;
         }
         changeTask({status: isCheck, _id:e.target.getAttribute('data-id')}, e.target.parentNode);
+        showBottomContainer();
     }
 
     /**
@@ -275,6 +262,8 @@
     {
         removeById({_id: e.target.getAttribute('data-id')}, function(){
             deleteInCollection(e.target.getAttribute('data-id'));
+            taskToDo--;
+            showBottomContainer();
             e.target.parentNode.style.display = 'none';
         }, error);
     }
@@ -289,15 +278,19 @@
         var status = false;
         if(e.target.checked)
         {
-           var status = true;
-           taskToDo = 0;
+           status = true;
         }
         for( var i = 0 ; i < collection.length ; i++)
         {
             updataById({status:status, _id:collection[i]._id}, function(){}, error);
+            taskToDo++;
             collection[i].status = status;
         }       
         showAllTasks(collection);
+        if(e.target.checked)
+        {
+            taskToDo = 0;
+        }
         showBottomContainer();
 
     }
@@ -328,7 +321,7 @@
         {
             showAllTasks(collection);
         }
-
+        showBottomContainer();
     }
 
     /**
@@ -337,9 +330,9 @@
     */
     function changeDivToInput(e)
     {
-        if(htmlElement)
+        if(ElementWhichUpdating)
         {
-            reDisplay(getTaskById(htmlElement.getAttribute('data-id')), htmlElement);
+            showTaskInList(getTaskById(ElementWhichUpdating.getAttribute('data-id')), ElementWhichUpdating);
         }
         var inputbox = document.createElement('input');
         inputbox.id = e.target.getAttribute('data-id');
@@ -351,7 +344,7 @@
         e.target.appendChild(inputbox);
         inputbox.focus();
         inputbox.select();
-        htmlElement = e.target.parentNode;
+        ElementWhichUpdating = e.target.parentNode;
 
     }
 
@@ -367,7 +360,7 @@
         }
         if(e.keyCode === 27)
         {
-           reDisplay(getTaskById(e.target.id), (e.target.parentNode).parentNode);
+           showTaskInList(getTaskById(e.target.id), (e.target.parentNode).parentNode);
         }
     }
 
