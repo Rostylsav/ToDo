@@ -71,7 +71,7 @@
         	);
 		};
 
-		this.getTaskById = function( id ){
+		this.getElementById = function( id ){
 
 			for( var i = 0 ; i < this.collection.length; i++)
             { 
