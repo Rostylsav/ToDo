@@ -281,7 +281,7 @@
     function remove(e)
     {
         var id = e.target.getAttribute('data-id');
-        
+
         collectionOfTask.remove(
                 {
                     _id: id
@@ -302,23 +302,22 @@
     function checkAll(e)
     {
         var status = false;
+
         if(e.target.checked)
         {
            status = true;
         }
-        for( var i = 0 ; i < collectionOfTask.length ; i++)
-        {
-            updataById({status:status, _id:collectionOfTask[i]._id}, function(){}, error);
-            taskToDo++;
-            collectionOfTask[i].status = status;
-        }       
-        showAllTasks(collectionOfTask);
-        if(e.target.checked)
-        {
-            taskToDo = 0;
-        }
-        showBottomContainer();
 
+        collectionOfTask.checkAll(
+            status,
+            function(){},
+            error
+        );
+        collectionOfTask.load(
+            function (data){
+                showAllTasks(data);
+            }
+        );
     }
 
     /**

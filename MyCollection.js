@@ -77,6 +77,20 @@
         		erroeCallback
         	);
 		};
+
+		this.checkAll = function (isChack, callback, erroeCallback){
+			for (var i = 0; i< this.collection.length; i++ )
+			{
+				this.updata(
+					{
+						status: isChack,
+						_id: this.collection[i]._id
+					},
+					callback(newTask),
+					erroeCallback
+				);
+			}
+		};
 	}
 
 	window.MyCollection = MyCollection;
