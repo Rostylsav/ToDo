@@ -11,8 +11,7 @@
     * Called in case of error during request to the server.
     * @param {String} text. String for display.
     */   
-    function error(text)
-    {
+    function error(text){
         console.log('Error is :' + text);
     }
    
@@ -21,12 +20,12 @@
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     */  
-    function showTask(task)
-    {
+    function showTask(task){
         var container= document.getElementById('containerShowTask');
 
         var containerOfOneTask = document.createElement('div');
-            containerOfOneTask.setAttribute('data-id',task._id);
+            containerOfOneTask.setAttribute('data-id', task._id);
+            containerOfOneTask.id = 'conOfTask'+ task._id;
             containerOfOneTask.className="containerOfOneTask";
 
         showTaskInList(task, containerOfOneTask);
@@ -38,8 +37,7 @@
     /**
     * Shows container which contains buttons for filtering. 
     */ 
-    function showBottomContainer()
-    {
+    function showBottomContainer(){
         var container = document.getElementById('bottomContainer');
         container.innerHTML = '';
 
@@ -84,39 +82,25 @@
     * Shows all task
     * @param {Array} array. collectionOfTask of task for display.
     */ 
-    function showAllTasks(array)
-    {
+    function showAllTasks(array){
         document.getElementById('containerShowTask').innerHTML = '';
         taskToDo = 0;
-        for( var i = 0 ; i < array.length ; i++)
-        {
+        for( var i = 0 ; i < array.length ; i++){
             showTask(array[i]);
-            if(array[i].status == false)
-            { taskToDo++;} 
+            if(array[i].status == false){
+                taskToDo++;
+            } 
         }
         showBottomContainer();
     }
 
-    /**
-    * Display all task.
-    */ 
-    function displayAll()
-    {
-        readAll(function(text){
-            collectionOfTask = JSON.parse(text);
-            showAllTasks(collectionOfTask);
-            showBottomContainer();     
-        }, error); 
-    }
     /**
     * showTaskInList task which was modefyed
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     * @param {Html} elem. Html elememt which will redisply.
     */
-    function showTaskInList(obj, elem)
-    {
-
+    function showTaskInList(obj, elem){
         elem.innerHTML = '';
         var div = document.createElement('div');
             div.setAttribute('data-id',obj._id);
@@ -128,8 +112,7 @@
             checkbox.className = 'checkbox';
             checkbox.type = 'checkbox';
             checkbox.checked = obj.status;
-            if(obj.status == true)
-            {
+            if(obj.status == true){
                 div.className = "showValueOfCheckedTask";
             }
             checkbox.addEventListener("click", mark, false);
@@ -147,79 +130,15 @@
         elem.appendChild(button);
     }
 
-    /**
-    * Change task in collectionOfTask .
-    * @param {Object} element. New element for changin.
-    */ 
-    function changeIncollectionOfTask(element)
-    {
-        for( var i = 0 ; i < collectionOfTask.length; i++)
-        { 
-            if(collectionOfTask[i]._id === element._id)
-            {
-                collectionOfTask[i] = element;
-            }
-        }
-    }
-
-    /**
-    * Delete task in collectionOfTask .
-    * @param {Number} id. d of task which was delete.
-    */ 
-    function deleteIncollectionOfTask(id)
-    {
-        for( var i = 0 ; i < collectionOfTask.length; i++)
-            { 
-
-                if(collectionOfTask[i]._id === id)
-                {
-                    if(!(collectionOfTask[i].status))
-                    {
-                         taskToDo--;
-                    }
-                    collectionOfTask.splice(i, 1);
-                }
-            }
-    } 
-
-    /**
-    * Get task from collectionOfTask by id .
-    * @param {Number} id. Id of task.
-    */ 
-    function getTaskById(id)
-    {
-         for( var i = 0 ; i < collectionOfTask.length; i++)
-        { 
-            if(collectionOfTask[i]._id === id)
-            {
-               return collectionOfTask[i];
-            }
-        }
-    }
-    /**
-    * Changing task in collectionOfTask and et server and showTaskInList it.
-    * @param {Object} obj. Object with parameters task (new value of task) and status(new status of task).
-    * @param {Html} elem. Html element for showTaskInList. 
-    */ 
-    function changeTask(obj, elem)
-    {
-        updataById(obj, function(text){
-            changeIncollectionOfTask(JSON.parse(text));
-            showTaskInList(JSON.parse(text), elem);
-        }, error);
-    }
 
     /**
     * Creates a new task.
     * @param {Event} e.
     */ 
-    function createTask(e)
-    {
+    function createTask(e){
         var taskName = document.getElementById('enterTask').value;
-        if (e.keyCode === 13)
-        {
-            if( taskName != '')
-            {
+        if (e.keyCode === 13){
+            if( taskName != ''){
                 collectionOfTask.create(
                     {
                         task: taskName,
@@ -233,8 +152,7 @@
                     error  
                 );
             }
-            else
-            {
+            else{
                 console.log('Error. task is not enter');
             }
         }
@@ -244,16 +162,13 @@
     * Changing status and css style of task.
     * @param {Event} e.
     */ 
-    function mark(e)
-    {
+    function mark(e){
         var isCheck = false;
-        if(e.target.checked)
-        {
+        if(e.target.checked){
             isCheck = true;
             taskToDo--;
         }
-        else
-        {
+        else{
             taskToDo++;
         }
 
@@ -278,9 +193,12 @@
     * Delete task by id.
     * @param {Event} e.
     */
-    function remove(e)
-    {
+    function remove(e){
         var id = e.target.getAttribute('data-id');
+
+        if(!( ( collectionOfTask.getTaskById( id )).status )){
+            taskToDo--;
+        }
 
         collectionOfTask.remove(
                 {
@@ -299,65 +217,65 @@
     * Changing status of all task and display them.
     * @param {Event} e.
     */
-    function checkAll(e)
-    {
-        var status = false;
+    function checkAll(e){
+        var isCheck = false,
+            array = collectionOfTask.collection;
 
-        if(e.target.checked)
-        {
-           status = true;
+        if(e.target.checked){
+           isCheck = true;
         }
 
-        collectionOfTask.checkAll(
-            status,
-            function(){},
-            error
-        );
-        collectionOfTask.load(
-            function (data){
-                showAllTasks(data);
-            }
-        );
+        for (var i = 0; i < array.length; i++){
+            collectionOfTask.updata(
+                    {
+                        status: isCheck,
+                        _id:array[i]._id
+                    },
+                    function(newTask){
+                        var task = JSON.parse(newTask),
+                            taskContainer = document.getElementById('conOfTask'+ task._id);
+
+                        showTaskInList(task, taskContainer);
+                    },
+                    error
+                );
+        }
     }
 
     /**
     * filters adn displays collectionOfTask of task by status
     * @param {Event} e.
     */
-    function filter(e)
-    {
-        var array = [],
-            status = true;
+    function filter(e){
+        var array = collectionOfTask.collection,
+            arrayToDisplay = [],
+            isCheck = true;
 
-        if(e.target.id === 'active')
-        {
-            status = false;
+        if(e.target.id === 'active'){
+            isCheck = false;
         }    
-        for (var i = 0; i < collectionOfTask.length; i++)
-        {
-            if(collectionOfTask[i].status === status)
+        for (var i = 0; i < array.length; i++){
+            if(array[i].status === isCheck)
             {
-                array.push(collectionOfTask[i]);
+                arrayToDisplay.push(array[i]);
             }
         }
-        showAllTasks(array);
 
-        if(e.target.id === 'all')
-        {
-            showAllTasks(collectionOfTask);
+        showAllTasks(arrayToDisplay);
+
+        if(e.target.id === 'all'){
+            showAllTasks(array);
         }
-        showBottomContainer();
     }
 
     /**
     * Changing html element div to input for changing value of target task 
     * @param {Event} e.
     */
-    function changeDivToInput(e)
-    {
+    function changeDivToInput(e) {
         if(ElementWhichUpdating)
         {
-            showTaskInList(getTaskById(ElementWhichUpdating.getAttribute('data-id')), ElementWhichUpdating);
+            showTaskInList(collectionOfTask.getTaskById(ElementWhichUpdating.getAttribute('data-id')), ElementWhichUpdating);
         }
         var inputbox = document.createElement('input');
         inputbox.id = e.target.getAttribute('data-id');
@@ -381,11 +299,23 @@
     {   
         if (e.keyCode === 13)
         {
-            changeTask({task: e.target.value, _id:e.target.id}, (e.target.parentNode).parentNode);
+             collectionOfTask.updata(
+                    {
+                        task: e.target.value,
+                        _id:e.target.id
+                    },
+                    function(newTask){
+                        var task = JSON.parse(newTask),
+                            taskContainer = document.getElementById('conOfTask'+ task._id);
+
+                        showTaskInList(task, taskContainer);
+                    },
+                    error
+                );
         }
         if(e.keyCode === 27)
         {
-           showTaskInList(getTaskById(e.target.id), (e.target.parentNode).parentNode);
+           showTaskInList(collectionOfTask.getTaskById(e.target.id), (e.target.parentNode).parentNode);
         }
     }
 

@@ -6,91 +6,81 @@
 	    this.collection = [];
 
 	    this.load = function(callback){
-	    	reqRes(this.url, function(text){ 
-	    		this.collection = JSON.parse(text); 
-	    		callback(this.collection);
+	    	var that = this;
+	    	reqRes(that.url, function(text){ 
+	    		that.collection = JSON.parse(text); 
+	    		callback(that.collection);
 	    	});
 	    };
 
-		this.create = function( obj, callback, erroeCallback ) {
+		this.create = function( obj, callback, errorCallback ) {
+			var that = this;
 			create(
 				obj,
 				function(task){ 
-	                this.collection.push(JSON.parse(task));
+	                that.collection.push(JSON.parse(task));
 	                callback(task);
 	            },
-	            erroeCallback
+	            errorCallback
 	        );
 		};
 
-		this.changeInCollection = function( obj, array) {
-
-			for( var i = 0 ; i < array.length; i++)
+		this.changeInCollection = function( obj) {
+			for( var i = 0 ; i < this.collection.length; i++)
 	        { 
-	            if(array[i]._id === obj._id)
+	            if(this.collection[i]._id === obj._id)
 	            {
-	            	array[i] = obj;
+	            	this.collection[i] = obj;
 	            }
 	        }
 		};
 
 
-		this.updata = function( obj, callback, erroeCallback ) {
-
+		this.updata = function( obj, callback, errorCallback ) {
 			var that = this;
-
 			updataById(
 				obj,
 				function(newTask){ 
 					var task = JSON.parse(newTask);
-	                that.changeInCollection(task, this.collection);
+	                that.changeInCollection(task);
 	                callback(newTask);
 	            },
-	            erroeCallback
+	            errorCallback
 	        );
 		};
 
-		this.deleteInColection = function( id , array){
-			for( var i = 0 ; i < array.length; i++)
+		this.deleteInColection = function( id ){
+			for( var i = 0 ; i < this.collection.length; i++)
             { 
-                if(array[i]._id === id)
+                if(this.collection[i]._id === id)
                 {
-                	if(!(array[i].status))
-                	{
-                		taskToDo--;
-                	}
-                    array.splice(i, 1);
+                    this.collection.splice(i, 1);
                 }
             }
-		}
+		};
 
-		this.remove = function ( obj, callback, erroeCallback ){
-
+		this.remove = function ( obj, callback, errorCallback ){
 			var that = this;
-
 			removeById(
 				obj,
 				function(){
-					that.deleteInColection(obj._id, this.collection);
+					that.deleteInColection(obj._id);
 					callback();
         		},
-        		erroeCallback
+        		errorCallback
         	);
 		};
 
-		this.checkAll = function (isChack, callback, erroeCallback){
-			for (var i = 0; i< this.collection.length; i++ )
-			{
-				this.updata(
-					{
-						status: isChack,
-						_id: this.collection[i]._id
-					},
-					callback(newTask),
-					erroeCallback
-				);
-			}
-		};
+		this.getTaskById = function( id ){
+
+			for( var i = 0 ; i < this.collection.length; i++)
+            { 
+                if(this.collection[i]._id === id)
+                {
+                   	return this.collection[i];
+                }
+            }
+		}
 	}
 
 	window.MyCollection = MyCollection;
