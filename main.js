@@ -280,12 +280,13 @@
     */
     function remove(e)
     {
+        var id = e.target.getAttribute('data-id');
+        
         collectionOfTask.remove(
                 {
-                    _id: e.target.getAttribute('data-id')
+                    _id: id
                 },
                 function (){
-                    taskToDo--;
                     showBottomContainer();
                     e.target.parentNode.style.display = 'none';
                 },
@@ -406,5 +407,5 @@
         );
     }
     window.init = init;
-    //window.taskToDo = taskToDo;
+    window.taskToDo = taskToDo;
 })();

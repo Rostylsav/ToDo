@@ -44,7 +44,6 @@
 				function(newTask){ 
 					var task = JSON.parse(newTask);
 	                that.changeInCollection(task, this.collection);
-	               	console.log(this.collection);
 	                callback(newTask);
 	            },
 	            erroeCallback
@@ -56,22 +55,28 @@
             { 
                 if(array[i]._id === id)
                 {
+                	if(!(array[i].status))
+                	{
+                		taskToDo--;
+                	}
                     array.splice(i, 1);
                 }
             }
 		}
 
 		this.remove = function ( obj, callback, erroeCallback ){
+
+			var that = this;
+
 			removeById(
 				obj,
 				function(){
-					this.deleteInColection(obj._id, this.collection);
-					console.log(this.collection);
+					that.deleteInColection(obj._id, this.collection);
 					callback();
         		},
         		erroeCallback
         	);
-		}
+		};
 	}
 
 	window.MyCollection = MyCollection;
