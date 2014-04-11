@@ -4,7 +4,7 @@
     * Variable that stores the number of tasks to perform
     */  
     var taskToDo = 0,
-        collection = [], 
+        collectionOfTask,
         ElementWhichUpdating ;
 
     /**
@@ -82,7 +82,7 @@
 
     /**
     * Shows all task
-    * @param {Array} array. Collection of task for display.
+    * @param {Array} array. collectionOfTask of task for display.
     */ 
     function showAllTasks(array)
     {
@@ -103,8 +103,8 @@
     function displayAll()
     {
         readAll(function(text){
-            collection = JSON.parse(text);
-            showAllTasks(collection);
+            collectionOfTask = JSON.parse(text);
+            showAllTasks(collectionOfTask);
             showBottomContainer();     
         }, error); 
     }
@@ -148,63 +148,63 @@
     }
 
     /**
-    * Change task in collection .
+    * Change task in collectionOfTask .
     * @param {Object} element. New element for changin.
     */ 
-    function changeInCollection(element)
+    function changeIncollectionOfTask(element)
     {
-        for( var i = 0 ; i < collection.length; i++)
+        for( var i = 0 ; i < collectionOfTask.length; i++)
         { 
-            if(collection[i]._id === element._id)
+            if(collectionOfTask[i]._id === element._id)
             {
-                collection[i] = element;
+                collectionOfTask[i] = element;
             }
         }
     }
 
     /**
-    * Delete task in collection .
+    * Delete task in collectionOfTask .
     * @param {Number} id. d of task which was delete.
     */ 
-    function deleteInCollection(id)
+    function deleteIncollectionOfTask(id)
     {
-        for( var i = 0 ; i < collection.length; i++)
+        for( var i = 0 ; i < collectionOfTask.length; i++)
             { 
 
-                if(collection[i]._id === id)
+                if(collectionOfTask[i]._id === id)
                 {
-                    if(!(collection[i].status))
+                    if(!(collectionOfTask[i].status))
                     {
                          taskToDo--;
                     }
-                    collection.splice(i, 1);
+                    collectionOfTask.splice(i, 1);
                 }
             }
     } 
 
     /**
-    * Get task from collection by id .
+    * Get task from collectionOfTask by id .
     * @param {Number} id. Id of task.
     */ 
     function getTaskById(id)
     {
-         for( var i = 0 ; i < collection.length; i++)
+         for( var i = 0 ; i < collectionOfTask.length; i++)
         { 
-            if(collection[i]._id === id)
+            if(collectionOfTask[i]._id === id)
             {
-               return collection[i];
+               return collectionOfTask[i];
             }
         }
     }
     /**
-    * Changing task in collection and et server and showTaskInList it.
+    * Changing task in collectionOfTask and et server and showTaskInList it.
     * @param {Object} obj. Object with parameters task (new value of task) and status(new status of task).
     * @param {Html} elem. Html element for showTaskInList. 
     */ 
     function changeTask(obj, elem)
     {
         updataById(obj, function(text){
-            changeInCollection(JSON.parse(text));
+            changeIncollectionOfTask(JSON.parse(text));
             showTaskInList(JSON.parse(text), elem);
         }, error);
     }
@@ -215,17 +215,23 @@
     */ 
     function createTask(e)
     {
-        var elem = document.getElementById('enterTask').value;
+        var taskName = document.getElementById('enterTask').value;
         if (e.keyCode === 13)
         {
-            if(elem !='')
+            if( taskName != '')
             {
-                create({task: elem, status: false}, function(text){ 
-                        collection.push(JSON.parse(text));
-                        showTask(JSON.parse(text));
+                collectionOfTask.create(
+                    {
+                        task: taskName,
+                        status: false
+                    },
+                    function(task){
+                        showTask(JSON.parse(task));
                         taskToDo++;
                         showBottomContainer();
-                    }, error);
+                    },
+                    error  
+                );
             }
             else
             {
@@ -250,8 +256,22 @@
         {
             taskToDo++;
         }
-        changeTask({status: isCheck, _id:e.target.getAttribute('data-id')}, e.target.parentNode);
-        showBottomContainer();
+
+        collectionOfTask.updata(
+            {
+                status: isCheck,
+                _id:e.target.getAttribute('data-id')
+            },
+            function(newTask){
+
+                var taskContainer = e.target.parentNode,
+                task = JSON.parse(newTask);
+
+                showTaskInList(task, taskContainer);
+                showBottomContainer();
+            },
+            error
+        );
     }
 
     /**
@@ -261,7 +281,7 @@
     function remove(e)
     {
         removeById({_id: e.target.getAttribute('data-id')}, function(){
-            deleteInCollection(e.target.getAttribute('data-id'));
+            deleteIncollectionOfTask(e.target.getAttribute('data-id'));
             taskToDo--;
             showBottomContainer();
             e.target.parentNode.style.display = 'none';
@@ -280,13 +300,13 @@
         {
            status = true;
         }
-        for( var i = 0 ; i < collection.length ; i++)
+        for( var i = 0 ; i < collectionOfTask.length ; i++)
         {
-            updataById({status:status, _id:collection[i]._id}, function(){}, error);
+            updataById({status:status, _id:collectionOfTask[i]._id}, function(){}, error);
             taskToDo++;
-            collection[i].status = status;
+            collectionOfTask[i].status = status;
         }       
-        showAllTasks(collection);
+        showAllTasks(collectionOfTask);
         if(e.target.checked)
         {
             taskToDo = 0;
@@ -296,7 +316,7 @@
     }
 
     /**
-    * filters adn displays collection of task by status
+    * filters adn displays collectionOfTask of task by status
     * @param {Event} e.
     */
     function filter(e)
@@ -308,18 +328,18 @@
         {
             status = false;
         }    
-        for (var i = 0; i < collection.length; i++)
+        for (var i = 0; i < collectionOfTask.length; i++)
         {
-            if(collection[i].status === status)
+            if(collectionOfTask[i].status === status)
             {
-                array.push(collection[i]);
+                array.push(collectionOfTask[i]);
             }
         }
         showAllTasks(array);
 
         if(e.target.id === 'all')
         {
-            showAllTasks(collection);
+            showAllTasks(collectionOfTask);
         }
         showBottomContainer();
     }
@@ -369,9 +389,16 @@
     */
     function init()
     {
+        collectionOfTask = new MyCollection('http://localhost:3000/task');
+
         document.getElementById('enterTask').addEventListener('keypress',createTask,false);
         document.getElementById('checkAll').addEventListener('click', checkAll, false);
-        displayAll();
+        
+        collectionOfTask.load(
+            function (data){
+                showAllTasks(data);
+            }
+        );
     }
     window.init = init;
 })();

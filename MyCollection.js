@@ -1,6 +1,6 @@
 (function(){
 
-	function Task(url)
+	function MyCollection(url)
 	{
 		this.url = url;
 	    this.collection = [];
@@ -10,20 +10,49 @@
 	    		this.collection = JSON.parse(text); 
 	    		callback(this.collection);
 	    	});
-	    }
-	}
-	function init()
-	{
-		document.getElementById('enterTask').addEventListener('keypress',createTask,false);
-	    document.getElementById('checkAll').addEventListener('click', checkAll, false);
+	    };
+
+		this.create = function( obj, callback, erroeCallback ) {
+			create(
+				obj,
+				function(task){ 
+	                this.collection.push(JSON.parse(task));
+
+	                callback(task);
+	            },
+	            erroeCallback
+	        );
+		};
+
+		this.changeInCollection = function( obj ) {
+			for( var i = 0 ; i < this.collection.length; i++)
+	        { 
+	            if(this.collection[i]._id === obj._id)
+	            {
+	                this.collection[i] = obj;
+	            }
+	        }
+		};
 
 
-		var collectionOfTask = new Task('http://localhost:3000/task');
-		collectionOfTask.load(function(data) {
-			showAllTasks(data);
-		});
-	}
-	window.init = init;
+		this.updata = function( obj, callback, erroeCallback ) {
+
+			var that = this;
+
+			updataById(
+				obj,
+				function(newTask){ 
+					var task = JSON.parse(newTask);
+	                that.changeInCollection(task);
+	                callback(newTask);
+	            },
+	            erroeCallback
+	        );
+		};
+
+			}
+
+	window.MyCollection = MyCollection;
 }());
 
 
