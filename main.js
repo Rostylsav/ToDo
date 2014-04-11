@@ -280,12 +280,17 @@
     */
     function remove(e)
     {
-        removeById({_id: e.target.getAttribute('data-id')}, function(){
-            deleteIncollectionOfTask(e.target.getAttribute('data-id'));
-            taskToDo--;
-            showBottomContainer();
-            e.target.parentNode.style.display = 'none';
-        }, error);
+        collectionOfTask.remove(
+                {
+                    _id: e.target.getAttribute('data-id')
+                },
+                function (){
+                    taskToDo--;
+                    showBottomContainer();
+                    e.target.parentNode.style.display = 'none';
+                },
+                error
+            );
     }
 
 
@@ -401,4 +406,5 @@
         );
     }
     window.init = init;
+    //window.taskToDo = taskToDo;
 })();

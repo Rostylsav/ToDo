@@ -17,19 +17,19 @@
 				obj,
 				function(task){ 
 	                this.collection.push(JSON.parse(task));
-
 	                callback(task);
 	            },
 	            erroeCallback
 	        );
 		};
 
-		this.changeInCollection = function( obj ) {
-			for( var i = 0 ; i < this.collection.length; i++)
+		this.changeInCollection = function( obj, array) {
+
+			for( var i = 0 ; i < array.length; i++)
 	        { 
-	            if(this.collection[i]._id === obj._id)
+	            if(array[i]._id === obj._id)
 	            {
-	                this.collection[i] = obj;
+	            	array[i] = obj;
 	            }
 	        }
 		};
@@ -43,14 +43,36 @@
 				obj,
 				function(newTask){ 
 					var task = JSON.parse(newTask);
-	                that.changeInCollection(task);
+	                that.changeInCollection(task, this.collection);
+	               	console.log(this.collection);
 	                callback(newTask);
 	            },
 	            erroeCallback
 	        );
 		};
 
-			}
+		this.deleteInColection = function( id , array){
+			for( var i = 0 ; i < array.length; i++)
+            { 
+                if(array[i]._id === id)
+                {
+                    array.splice(i, 1);
+                }
+            }
+		}
+
+		this.remove = function ( obj, callback, erroeCallback ){
+			removeById(
+				obj,
+				function(){
+					this.deleteInColection(obj._id, this.collection);
+					console.log(this.collection);
+					callback();
+        		},
+        		erroeCallback
+        	);
+		}
+	}
 
 	window.MyCollection = MyCollection;
 }());
