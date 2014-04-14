@@ -1,5 +1,4 @@
-(function()
-{
+(function($, undefined){
     /**
     * Variable that stores the number of tasks to perform
     */  
@@ -21,34 +20,75 @@
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     * @param {Html} elem. Html elememt which will display.
     */
-    function componentsOfTask(obj, elem){
-        elem.innerHTML = '';
-        var div = document.createElement('div');
-            div.setAttribute('data-id',obj._id);
-            div.className = 'showValueOfTask';
-            div.ondblclick = changeDivToInput;
+    function componentsOfTask(obj, dataId){
+       
+        var elem = $('#conOfTask'+ dataId);
+       elem.text(''); 
 
-        var checkbox = document.createElement('input');
-            checkbox.setAttribute('data-id',obj._id);
-            checkbox.className = 'checkbox';
-            checkbox.type = 'checkbox';
-            checkbox.checked = obj.status;
-            if(obj.status == true){
-                div.className = "checkedTask";
+       // console.log(elem);
+        var div = $('<div>').attr({
+            'data-id' : obj._id,
+            'class': 'showValueOfTask'
+        });
+
+        var checkbox = $('<input>').attr({
+            'data-id': obj._id,
+            'class': 'checkbox',
+            'type' : 'checkbox',
+            'checked' : obj.status
+        });
+        if(obj.status == true){
+                div.attr('calss',"checkedTask");
             }
-            checkbox.addEventListener("click", mark, false);
+        checkbox.on("click", mark);
 
-        var button=document.createElement('button');
-            button.setAttribute('data-id',obj._id);
-            button.className = "button";
-            button.addEventListener('click',remove, false);
 
-        button.appendChild(document.createTextNode('R'));
-        div.appendChild(document.createTextNode(obj.task));
 
-        elem.appendChild(checkbox);
-        elem.appendChild(div);
-        elem.appendChild(button);
+        div.text(obj.task);
+        div.on('dblclick',changeDivToInput);
+
+
+        var button = $('<button>').attr({
+            'data-id' : obj._id,
+            'class': 'button'
+        });
+        button.text('R');
+        button.on('click',remove);
+
+
+        elem.append(checkbox);
+        elem.append(div);
+        elem.append(button);
+
+
+       // $('#listTasks').append(container);
+
+        // var div = document.createElement('div');
+        //     div.setAttribute('data-id',obj._id);
+        //     div.className = 'showValueOfTask';
+        //     div.ondblclick = changeDivToInput;
+
+        // var checkbox = document.createElement('input');
+        //     checkbox.setAttribute('data-id',obj._id);
+        //     checkbox.className = 'checkbox';
+        //     checkbox.type = 'checkbox';
+        //     checkbox.checked = obj.status;
+        //     if(obj.status == true){
+        //         div.className = "checkedTask";
+        //     }
+        //     checkbox.addEventListener("click", mark, false);
+
+        // var button=document.createElement('button');
+        //     button.setAttribute('data-id',obj._id);
+        //     button.className = "button";
+        //     button.addEventListener('click',remove, false);
+
+        // button.appendChild(document.createTextNode('R'));
+        // div.appendChild(document.createTextNode(obj.task));
+
+        // elem.appendChild(checkbox);
+        // elem.appendChild(div);
+        // elem.appendChild(button);
     }
    
     /**
@@ -64,7 +104,7 @@
             containerOfOneTask.id = 'conOfTask'+ task._id;
             containerOfOneTask.className="containerOfOneTask";
 
-        componentsOfTask(task, containerOfOneTask);
+        componentsOfTask(task, task._id);
 
         document.getElementById('enterTask').value=''; 
         container.appendChild(containerOfOneTask);
@@ -173,15 +213,14 @@
                 _id:e.target.getAttribute('data-id')
             },
             function(newTask){
-                var taskContainer = e.target.parentNode,
-                    task = JSON.parse(newTask);
+                var  task = JSON.parse(newTask);
                 if(task.status){
                     taskToDo--;
                 }
                 else{
                     taskToDo++;
                 }
-                componentsOfTask(task, taskContainer);
+                componentsOfTask(task, e.target.getAttribute('data-id'));
                 displayBottomContainer();
             },
             error
@@ -236,7 +275,7 @@
                 function(newTask){
                     var task = JSON.parse(newTask),
                         taskContainer = document.getElementById('conOfTask'+ task._id);
-                    componentsOfTask(task, taskContainer);
+                    componentsOfTask(task, e.target.getAttribute('data-id'));
                 },
                 error
             );
@@ -269,7 +308,7 @@
     function changeDivToInput(e) {
         if(ElementWhichUpdating)
         {
-            componentsOfTask(collectionOfTask.getElementById(ElementWhichUpdating.getAttribute('data-id')), ElementWhichUpdating);
+            componentsOfTask(collectionOfTask.getElementById(ElementWhichUpdating.getAttribute('data-id')), e.target.getAttribute('data-id'));
         }
         var inputbox = document.createElement('input');
         inputbox.id = e.target.getAttribute('data-id');
@@ -302,32 +341,44 @@
                         var task = JSON.parse(newTask),
                             taskContainer = document.getElementById('conOfTask'+ task._id);
 
-                        componentsOfTask(task, taskContainer);
+                        componentsOfTask(task, e.target.id);
                     },
                     error
                 );
         }
         if(e.keyCode === 27)
         {
-           componentsOfTask(collectionOfTask.getElementById(e.target.id), (e.target.parentNode).parentNode);
+           componentsOfTask(collectionOfTask.getElementById(e.target.id), (e.target.parentNode).getAttribute('data-id'));
         }
     }
 
     /**
     * Function starts after load html document.
     */
-    function init()
-    {
+    // function init()
+    // {
+    //     collectionOfTask = new MyCollection('http://localhost:3000/task');
+
+    //     document.getElementById('enterTask').addEventListener('keypress',createTask,false);
+    //     document.getElementById('checkAll').addEventListener('click', checkAll, false);
+        
+    //     collectionOfTask.load(
+    //         function (data){
+    //             showAllTasks(data);
+    //         }
+    //     );
+    // }
+   $(function(){
+
         collectionOfTask = new MyCollection('http://localhost:3000/task');
 
-        document.getElementById('enterTask').addEventListener('keypress',createTask,false);
-        document.getElementById('checkAll').addEventListener('click', checkAll, false);
+        $('#enterTask').on('keypress', createTask);
+        $('#checkAll').on('click', checkAll);
         
         collectionOfTask.load(
             function (data){
                 showAllTasks(data);
             }
         );
-    }
-    window.init = init;
-})();
+    });
+})(jQuery); 
