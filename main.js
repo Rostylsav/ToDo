@@ -21,7 +21,7 @@
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     * @param {Html} elem. Html elememt which will display.
     */
-    function displayTask(obj, elem){
+    function componentsOfTask(obj, elem){
         elem.innerHTML = '';
         var div = document.createElement('div');
             div.setAttribute('data-id',obj._id);
@@ -34,7 +34,7 @@
             checkbox.type = 'checkbox';
             checkbox.checked = obj.status;
             if(obj.status == true){
-                div.className = "showValueOfCheckedTask";
+                div.className = "checkedTask";
             }
             checkbox.addEventListener("click", mark, false);
 
@@ -56,7 +56,7 @@
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     */  
-    function displayListOfTask(task){
+    function displayTask(task){
         var container= document.getElementById('containerShowTask');
 
         var containerOfOneTask = document.createElement('div');
@@ -64,7 +64,7 @@
             containerOfOneTask.id = 'conOfTask'+ task._id;
             containerOfOneTask.className="containerOfOneTask";
 
-        displayTask(task, containerOfOneTask);
+        componentsOfTask(task, containerOfOneTask);
 
         document.getElementById('enterTask').value=''; 
         container.appendChild(containerOfOneTask);
@@ -122,7 +122,7 @@
         document.getElementById('containerShowTask').innerHTML = '';
         taskToDo = 0;
         for( var i = 0 ; i < array.length ; i++){
-            displayListOfTask(array[i]);
+            displayTask(array[i]);
             if(array[i].status == false){
                 taskToDo++;
             } 
@@ -144,7 +144,7 @@
                         status: false
                     },
                     function(task){
-                        displayListOfTask(JSON.parse(task));
+                        displayTask(JSON.parse(task));
                         taskToDo++;
                         displayBottomContainer();
                     },
@@ -181,7 +181,7 @@
                 else{
                     taskToDo++;
                 }
-                displayTask(task, taskContainer);
+                componentsOfTask(task, taskContainer);
                 displayBottomContainer();
             },
             error
@@ -236,7 +236,7 @@
                 function(newTask){
                     var task = JSON.parse(newTask),
                         taskContainer = document.getElementById('conOfTask'+ task._id);
-                    displayTask(task, taskContainer);
+                    componentsOfTask(task, taskContainer);
                 },
                 error
             );
@@ -249,21 +249,16 @@
     * @param {Event} e.
     */
     function filter(e){
-        var array = collectionOfTask.collection,
-            arrayToDisplay = [],
+        var arrayToDisplay = [],
             isCheck = true;
 
         if(e.target.id === 'active'){
             isCheck = false;
-        }    
-        for (var i = 0; i < array.length; i++){
-            if(array[i].status === isCheck){
-                arrayToDisplay.push(array[i]);
-            }
         }
+        arrayToDisplay = collectionOfTask.getFilteredCollection(isCheck);    
         showAllTasks(arrayToDisplay);
         if(e.target.id === 'all'){
-            showAllTasks(array);
+            showAllTasks(collectionOfTask.collection);
         }
     }
 
@@ -274,7 +269,7 @@
     function changeDivToInput(e) {
         if(ElementWhichUpdating)
         {
-            displayTask(collectionOfTask.getElementById(ElementWhichUpdating.getAttribute('data-id')), ElementWhichUpdating);
+            componentsOfTask(collectionOfTask.getElementById(ElementWhichUpdating.getAttribute('data-id')), ElementWhichUpdating);
         }
         var inputbox = document.createElement('input');
         inputbox.id = e.target.getAttribute('data-id');
@@ -307,14 +302,14 @@
                         var task = JSON.parse(newTask),
                             taskContainer = document.getElementById('conOfTask'+ task._id);
 
-                        displayTask(task, taskContainer);
+                        componentsOfTask(task, taskContainer);
                     },
                     error
                 );
         }
         if(e.keyCode === 27)
         {
-           displayTask(collectionOfTask.getElementById(e.target.id), (e.target.parentNode).parentNode);
+           componentsOfTask(collectionOfTask.getElementById(e.target.id), (e.target.parentNode).parentNode);
         }
     }
 

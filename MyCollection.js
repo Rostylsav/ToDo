@@ -15,13 +15,17 @@
 
 		this.create = function( obj, callback, errorCallback ) {
 			var that = this;
-			create(
-				obj,
+			reqRes(
+				that.url,
 				function(task){ 
 	                that.collection.push(JSON.parse(task));
 	                callback(task);
 	            },
-	            errorCallback
+	            errorCallback,
+	            {
+	            	method : 'POST',
+	            	data : JSON.stringify(obj)
+	            }
 	        );
 		};
 
@@ -38,14 +42,18 @@
 
 		this.updata = function( obj, callback, errorCallback ) {
 			var that = this;
-			updataById(
-				obj,
+			reqRes(
+				that.url,
 				function(newTask){ 
 					var task = JSON.parse(newTask);
 	                that.changeInCollection(task);
 	                callback(newTask);
 	            },
-	            errorCallback
+	            errorCallback,
+	            {
+	            	method : 'PUT',
+	            	data : JSON.stringify(obj)
+	            }
 	        );
 		};
 
@@ -61,18 +69,21 @@
 
 		this.remove = function ( obj, callback, errorCallback ){
 			var that = this;
-			removeById(
-				obj,
+			reqRes(
+				that.url,
 				function(){
 					that.deleteInColection(obj._id);
 					callback();
         		},
-        		errorCallback
+        		errorCallback,
+	            {
+	            	method : 'DELETE',
+	            	data : JSON.stringify(obj)
+	            }
         	);
 		};
 
 		this.getElementById = function( id ){
-
 			for( var i = 0 ; i < this.collection.length; i++)
             { 
                 if(this.collection[i]._id === id)
@@ -80,7 +91,17 @@
                    	return this.collection[i];
                 }
             }
-		}
+		};
+
+		this.getFilteredCollection = function (condition){
+			var arrayToDisplay = [];
+			for (var i = 0; i < this.collection.length; i++){
+	            if(this.collection[i].status === condition){
+	                arrayToDisplay.push(this.collection[i]);
+	            }
+	        }
+	        return arrayToDisplay;
+		};
 	}
 
 	window.MyCollection = MyCollection;

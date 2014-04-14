@@ -50,7 +50,7 @@ input[type="checkbox"],input[type="text"] {
 	overflow: auto;
 }
 
-.showValueOfCheckedTask{
+.checkedTask{
 	font-size: 23px;
 	padding-top: 23px;
 	color: #DCDCDC;
