@@ -13,145 +13,88 @@
     function error(text){
         console.log('Error is :' + text);
     }
-
-    /**
-    * Display one task
-    * @param {Object} task. It contains properties task{string}(that you want to do) and
-    *                 status{Boolean}(status of task) and _id{number}(id of task).
-    * @param {Html} elem. Html elememt which will display.
-    */
-    function componentsOfTask(obj, dataId){
-       
-        var elem = $('#conOfTask'+ dataId);
-       elem.text(''); 
-
-       // console.log(elem);
-        var div = $('<div>').attr({
-            'data-id' : obj._id,
-            'class': 'showValueOfTask'
-        });
-
-        var checkbox = $('<input>').attr({
-            'data-id': obj._id,
-            'class': 'checkbox',
-            'type' : 'checkbox',
-            'checked' : obj.status
-        });
-        if(obj.status == true){
-                div.attr('calss',"checkedTask");
-            }
-        checkbox.on("click", mark);
-
-
-
-        div.text(obj.task);
-        div.on('dblclick',changeDivToInput);
-
-
-        var button = $('<button>').attr({
-            'data-id' : obj._id,
-            'class': 'button'
-        });
-        button.text('R');
-        button.on('click',remove);
-
-
-        elem.append(checkbox);
-        elem.append(div);
-        elem.append(button);
-
-
-       // $('#listTasks').append(container);
-
-        // var div = document.createElement('div');
-        //     div.setAttribute('data-id',obj._id);
-        //     div.className = 'showValueOfTask';
-        //     div.ondblclick = changeDivToInput;
-
-        // var checkbox = document.createElement('input');
-        //     checkbox.setAttribute('data-id',obj._id);
-        //     checkbox.className = 'checkbox';
-        //     checkbox.type = 'checkbox';
-        //     checkbox.checked = obj.status;
-        //     if(obj.status == true){
-        //         div.className = "checkedTask";
-        //     }
-        //     checkbox.addEventListener("click", mark, false);
-
-        // var button=document.createElement('button');
-        //     button.setAttribute('data-id',obj._id);
-        //     button.className = "button";
-        //     button.addEventListener('click',remove, false);
-
-        // button.appendChild(document.createTextNode('R'));
-        // div.appendChild(document.createTextNode(obj.task));
-
-        // elem.appendChild(checkbox);
-        // elem.appendChild(div);
-        // elem.appendChild(button);
-    }
-   
     /**
     * Shows the task by creating all html elements
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     */  
     function displayTask(task){
-        var container= document.getElementById('containerShowTask');
+        var container= $('#containerShowTask');
 
-        var containerOfOneTask = document.createElement('div');
-            containerOfOneTask.setAttribute('data-id', task._id);
-            containerOfOneTask.id = 'conOfTask'+ task._id;
-            containerOfOneTask.className="containerOfOneTask";
 
-        componentsOfTask(task, task._id);
+        var containerOfOneTask = $('<div>').attr({
+            'id' : 'task'+ task._id,
+            'class' : 'containerOfOneTask' 
+        });
 
-        document.getElementById('enterTask').value=''; 
-        container.appendChild(containerOfOneTask);
+        var div = $('<div>').attr({
+            'data-id' : task._id,
+            'class' : 'showValueOfTask'
+        });
+        div.on('dblclick', changeDivToInput);
+        div.text(task.task);
+        var checkbox = $('<input>').attr({
+            'data-id' : task._id,
+            'class' : 'checkbox',
+            'type' : 'checkbox',
+            'checked' : task.status
+        });
+        if(task.status == true){
+            div.attr({
+                'class' : 'checkedTask'
+            });
+        }
+        checkbox.on("click", mark);
+
+        var button = $('<button>').attr({
+            'data-id' : task._id,
+            'class' : 'button'
+        });
+        button.on('click',remove);
+        button.text('R');
+          
+        $('#enterTask').val('');
+
+        containerOfOneTask.append(checkbox).append(div).append(button);
+        container.append(containerOfOneTask);
     }
 
     /**
     * Shows container which contains buttons for filtering. 
     */ 
     function displayBottomContainer(){
-        var container = document.getElementById('bottomContainer');
-        container.innerHTML = '';
+        var container = $('#bottomContainer');
+        container.html('');
 
-        var containerBottom = document.createElement('div');
-            containerBottom.setAttribute('data-id',0);
-            containerBottom.className = "containerOfOneTask";
+        var countOfTasks = $('<div>').attr({
+            'id' : "countOfTask",
+            'class' : 'countOfTask'
+        });
+        countOfTasks.text('Task to do: ' + taskToDo);
+            
+        var active = $('<button>').attr({
+            'id' : 'active',
+            'class' : 'buttomFilter'
+        });
+        active.on('click', filter);
+        active.text('Active');
+            
 
-        var countOfTasks = document.createElement('div');
-            countOfTasks.setAttribute('data-id',0);
-            countOfTasks.className = 'countOfTask';
-            countOfTasks.appendChild(document.createTextNode('Task to do: '+ taskToDo));
+        var completed = $('<button>').attr({
+            'id' : 'completed',
+            'class' : 'buttomFilter'
+        });
+        completed.on('click', filter);
+        completed.text('Completed');
 
-        var active = document.createElement('button');
-            active.id = 'active';
-            active.setAttribute('data-id',0);
-            active.className = "buttomFilter";
-            active.addEventListener('click', filter, false);
-            active.appendChild(document.createTextNode('Active'));
+        var all = $('<button>').attr({
+            'id' : 'all',
+            'class' : 'buttomFilter'
+        });
+        all.on('click', filter);
+        all.text('All');
 
-        var completed = document.createElement('button');
-            completed.id = 'completed';
-            completed.setAttribute('data-id',0);
-            completed.className = "buttomFilter";
-            completed.addEventListener('click', filter, false);
-            completed.appendChild(document.createTextNode('Completed'));
-
-        var all = document.createElement('button');
-            all.setAttribute('data-id',0);
-            all.id = 'all';
-            all.className = "buttomFilter";
-            all.addEventListener('click', filter, false);
-            all.appendChild(document.createTextNode('All'));
-
-        containerBottom.appendChild(countOfTasks);
-        containerBottom.appendChild(all);
-        containerBottom.appendChild(active);
-        containerBottom.appendChild(completed);
-        container.appendChild(containerBottom);
+        container.append(countOfTasks).append(all).append(active).append(completed);
     }
 
     /**
@@ -159,7 +102,7 @@
     * @param {Array} array. collectionOfTask of task for display.
     */ 
     function showAllTasks(array){
-        document.getElementById('containerShowTask').innerHTML = '';
+        $('#containerShowTask').text('');
         taskToDo = 0;
         for( var i = 0 ; i < array.length ; i++){
             displayTask(array[i]);
@@ -186,7 +129,7 @@
                     function(task){
                         displayTask(JSON.parse(task));
                         taskToDo++;
-                        displayBottomContainer();
+                        $('#countOfTask').text('Task to do: ' + taskToDo);
                     },
                     error  
                 );
@@ -213,15 +156,18 @@
                 _id:e.target.getAttribute('data-id')
             },
             function(newTask){
-                var  task = JSON.parse(newTask);
+                var taskContainer = e.target.parentNode,
+                    task = JSON.parse(newTask);
                 if(task.status){
                     taskToDo--;
                 }
                 else{
                     taskToDo++;
                 }
-                componentsOfTask(task, e.target.getAttribute('data-id'));
-                displayBottomContainer();
+                $('#task'+ e.target.getAttribute('data-id')).remove();
+              // e.target.parentNode.style.display = 'none';
+                displayTask(task);
+                $('#countOfTask').text('').text('Task to do: ' + taskToDo);
             },
             error
         );
@@ -243,7 +189,7 @@
                     _id: id
                 },
                 function (){
-                    displayBottomContainer();
+                    $('#countOfTask').text('').text('Task to do: ' + taskToDo);
                     e.target.parentNode.style.display = 'none';
                 },
                 error
@@ -258,6 +204,7 @@
     function checkAll(e){
         var isCheck = false,
             array = collectionOfTask.collection;
+            $('#containerShowTask').html('');
 
         if(e.target.checked){
            isCheck = true;
@@ -273,14 +220,13 @@
                     _id:array[i]._id
                 },
                 function(newTask){
-                    var task = JSON.parse(newTask),
-                        taskContainer = document.getElementById('conOfTask'+ task._id);
-                    componentsOfTask(task, e.target.getAttribute('data-id'));
+                    var task = JSON.parse(newTask);
+                    displayTask(task);
                 },
                 error
             );
         }
-        displayBottomContainer();
+        $('#countOfTask').text('').text('Task to do: ' + taskToDo);
     }
 
     /**
@@ -306,22 +252,22 @@
     * @param {Event} e.
     */
     function changeDivToInput(e) {
-        if(ElementWhichUpdating)
-        {
-            componentsOfTask(collectionOfTask.getElementById(ElementWhichUpdating.getAttribute('data-id')), e.target.getAttribute('data-id'));
+
+        if($('input .inputboxForChange')){
+            console.log('work');
         }
-        var inputbox = document.createElement('input');
-        inputbox.id = e.target.getAttribute('data-id');
-        inputbox.className = 'inputbox';
-        inputbox.type = 'text';
-        inputbox.value = e.target.innerHTML;
-        e.target.innerHTML = '';
-        inputbox.addEventListener("keydown", change, false);
-        e.target.appendChild(inputbox);
+
+        var div = $("div[data-id='" + e.target.getAttribute('data-id') + "']");
+        var inputbox = $('<input>').attr({
+            'class' : 'inputboxForChange',
+            'type' : 'text'
+        });
+
+        inputbox.on("keydown", change);
+        inputbox.val(div.text());
+        div.text('').append(inputbox);
         inputbox.focus();
         inputbox.select();
-        ElementWhichUpdating = e.target.parentNode;
-
     }
 
     /**
@@ -335,45 +281,29 @@
              collectionOfTask.updata(
                     {
                         task: e.target.value,
-                        _id:e.target.id
+                        _id: e.target.parentNode.getAttribute('data-id')
                     },
                     function(newTask){
-                        var task = JSON.parse(newTask),
-                            taskContainer = document.getElementById('conOfTask'+ task._id);
-
-                        componentsOfTask(task, e.target.id);
+                        var task = JSON.parse(newTask);
+                        $('#task'+ e.target.parentNode.getAttribute('data-id')).remove();
+                        displayTask(task); 
                     },
                     error
                 );
         }
         if(e.keyCode === 27)
         {
-           componentsOfTask(collectionOfTask.getElementById(e.target.id), (e.target.parentNode).getAttribute('data-id'));
+            var task = collectionOfTask.getElementById(e.target.parentNode.getAttribute('data-id'));
+            $('#task'+ e.target.parentNode.getAttribute('data-id')).remove();
+            displayTask(task);
         }
     }
 
-    /**
-    * Function starts after load html document.
-    */
-    // function init()
-    // {
-    //     collectionOfTask = new MyCollection('http://localhost:3000/task');
-
-    //     document.getElementById('enterTask').addEventListener('keypress',createTask,false);
-    //     document.getElementById('checkAll').addEventListener('click', checkAll, false);
-        
-    //     collectionOfTask.load(
-    //         function (data){
-    //             showAllTasks(data);
-    //         }
-    //     );
-    // }
-   $(function(){
-
+    $(function(){
         collectionOfTask = new MyCollection('http://localhost:3000/task');
 
-        $('#enterTask').on('keypress', createTask);
-        $('#checkAll').on('click', checkAll);
+        document.getElementById('enterTask').addEventListener('keypress',createTask,false);
+        document.getElementById('checkAll').addEventListener('click', checkAll, false);
         
         collectionOfTask.load(
             function (data){
