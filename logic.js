@@ -52,8 +52,17 @@
             }
         xhr.send(data);
     } 
+
+    function template(obj, row){
+        for (var property in obj){
+            var stringProperty = '{{' + property + '}}'; 
+            row = row.replace(new RegExp(stringProperty,'g'),obj[property]);
+        }
+        return $(row);
+    }
     /**
     *  Global functions.
     */
     window.reqRes = reqRes;
+    window.template = template;
 }())

@@ -4,7 +4,8 @@
     */  
     var taskToDo = 0,
         collectionOfTask,
-        ElementWhichUpdating ;
+        ElementWhichUpdating,
+        templateTask = '<div id="components{{_id}}" class="containerOfOneTask"><input class="checkbox" type="checkbox" data-id="{{_id}}"></input><div class="showValueOfTask" data-id="{{_id}}">{{task}}</div><button class="button" data-id="{{_id}}">R</button></div>' ;
 
     /**
     * Called in case of error during request to the server.
@@ -18,45 +19,72 @@
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     */  
-    function displayTask(task){
+    function displayTask(task, id){
         var container= $('#containerShowTask');
 
 
-        var containerOfOneTask = $('<div>').attr({
-            'id' : 'task'+ task._id,
-            'class' : 'containerOfOneTask' 
-        });
-
-        var div = $('<div>').attr({
-            'data-id' : task._id,
-            'class' : 'showValueOfTask'
-        });
-        div.on('dblclick', changeDivToInput);
-        div.text(task.task);
-        var checkbox = $('<input>').attr({
-            'data-id' : task._id,
-            'class' : 'checkbox',
-            'type' : 'checkbox',
-            'checked' : task.status
-        });
-        if(task.status == true){
-            div.attr({
-                'class' : 'checkedTask'
+        if(id){
+            var containerOfOneTask = $('#task' + id);
+        }
+        else{
+            var containerOfOneTask = $('<div>').attr({
+                'id' : 'task'+ task._id,
+                'class' : 'containerOfOneTask' 
             });
         }
-        checkbox.on("click", mark);
+        var components = template(task, templateTask);
 
-        var button = $('<button>').attr({
-            'data-id' : task._id,
-            'class' : 'button'
-        });
-        button.on('click',remove);
-        button.text('R');
-          
+        components.find('div').on('dblclick', changeDivToInput);
+        components.find('input').on("click", mark);
+        components.find('button').on('click',remove);
+
+
+        containerOfOneTask.append(components);
+        if(!(id)){
+            container.append(containerOfOneTask);
+        }
         $('#enterTask').val('');
 
-        containerOfOneTask.append(checkbox).append(div).append(button);
-        container.append(containerOfOneTask);
+
+        //     );
+        // var components = $('<div>').attr({
+        //     'id' : 'components'+ task._id,
+        //     'class' : 'containerOfOneTask' 
+        // });
+
+        // var div = $('<div>').attr({
+        //     'data-id' : task._id,
+        //     'class' : 'showValueOfTask'
+        // });
+        // div.on('dblclick', changeDivToInput);
+        // div.text(task.task);
+        // var checkbox = $('<input>').attr({
+        //     'data-id' : task._id,
+        //     'class' : 'checkbox',
+        //     'type' : 'checkbox',
+        //     'checked' : task.status
+        // });
+        // if(task.status == true){
+        //     div.attr({
+        //         'class' : 'checkedTask'
+        //     });
+        // }
+        // checkbox.on("click", mark);
+
+        // var button = $('<button>').attr({
+        //     'data-id' : task._id,
+        //     'class' : 'button'
+        // });
+        // button.on('click',remove);
+        // button.text('R');
+          
+        
+
+        // components.append(checkbox).append(div).append(button);
+        // containerOfOneTask.append(components);
+        // if(!(id)){
+        //     container.append(containerOfOneTask);
+        // }
     }
 
     /**
@@ -164,9 +192,9 @@
                 else{
                     taskToDo++;
                 }
-                $('#task'+ e.target.getAttribute('data-id')).remove();
-              // e.target.parentNode.style.display = 'none';
-                displayTask(task);
+                $('#components'+ e.target.getAttribute('data-id')).remove();
+                displayTask(task, e.target.getAttribute('data-id'));
+
                 $('#countOfTask').text('').text('Task to do: ' + taskToDo);
             },
             error
@@ -190,7 +218,7 @@
                 },
                 function (){
                     $('#countOfTask').text('').text('Task to do: ' + taskToDo);
-                    e.target.parentNode.style.display = 'none';
+                    $('#task' + e.target.getAttribute('data-id')).remove();
                 },
                 error
             );
@@ -253,12 +281,16 @@
     */
     function changeDivToInput(e) {
 
-        if($('input .inputboxForChange')){
-            console.log('work');
+        if($('.inputboxForChange').length){
+            var task = collectionOfTask.getElementById($('.inputboxForChange')[0].id);
+            console.log(task);
+            $('#components' + task._id).remove();
+            displayTask(task, task._id);
         }
 
         var div = $("div[data-id='" + e.target.getAttribute('data-id') + "']");
         var inputbox = $('<input>').attr({
+            'id' : e.target.getAttribute('data-id'),
             'class' : 'inputboxForChange',
             'type' : 'text'
         });
@@ -285,8 +317,8 @@
                     },
                     function(newTask){
                         var task = JSON.parse(newTask);
-                        $('#task'+ e.target.parentNode.getAttribute('data-id')).remove();
-                        displayTask(task); 
+                        $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
+                        displayTask(task, e.target.parentNode.getAttribute('data-id'));
                     },
                     error
                 );
@@ -294,8 +326,8 @@
         if(e.keyCode === 27)
         {
             var task = collectionOfTask.getElementById(e.target.parentNode.getAttribute('data-id'));
-            $('#task'+ e.target.parentNode.getAttribute('data-id')).remove();
-            displayTask(task);
+            $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
+            displayTask(task, e.target.parentNode.getAttribute('data-id'));
         }
     }
 
