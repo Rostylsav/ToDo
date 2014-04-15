@@ -1,11 +1,23 @@
 (function($, undefined){
     /**
-    * Variable that stores the number of tasks to perform
+    * Variable
     */  
     var taskToDo = 0,
         collectionOfTask,
         ElementWhichUpdating,
-        templateTask = '<div id="components{{_id}}" class="containerOfOneTask"><input class="checkbox" type="checkbox" data-id="{{_id}}"></input><div class="showValueOfTask" data-id="{{_id}}">{{task}}</div><button class="button" data-id="{{_id}}">R</button></div>' ;
+        templateTask = '<div id="components{{_id}}" class="containerOfOneTask">'+
+                            '<input class="checkbox" type="checkbox" data-id="{{_id}}" {{checked}}></input>'+
+                            '<div class="{{statusClass}}" data-id="{{_id}}">'+
+                                '{{task}}'+
+                            '</div>'+
+                            '<button class="button" data-id="{{_id}}">R</button>'+
+                        '</div>',
+        templateBottomContainer =   '<div id="countOfTask" class="countOfTask">'+
+                                        'Task to do: {{taskToDo}}'+        
+                                    '</div>'+
+                                    '<button id="all" class="buttomFilter">All</button>'+
+                                    '<button id="active" class="buttomFilter">Active</button>'+
+                                    '<button id="completed" class="buttomFilter">Completed</button>';
 
     /**
     * Called in case of error during request to the server.
@@ -19,12 +31,10 @@
     * @param {Object} task. It contains properties task{string}(that you want to do) and
     *                 status{Boolean}(status of task) and _id{number}(id of task).
     */  
-    function displayTask(task, id){
+    function displayTask(task){
         var container= $('#containerShowTask');
-
-
-        if(id){
-            var containerOfOneTask = $('#task' + id);
+        if($('#task' + task._id).length){
+            var containerOfOneTask = $('#task' + task._id);
         }
         else{
             var containerOfOneTask = $('<div>').attr({
@@ -32,59 +42,17 @@
                 'class' : 'containerOfOneTask' 
             });
         }
+        task.statusClass = task.status ? 'checkedTask' : 'showValueOfTask';
+        task.checked = task.status ? 'checked = "checked"' : '';
         var components = template(task, templateTask);
-
         components.find('div').on('dblclick', changeDivToInput);
         components.find('input').on("click", mark);
         components.find('button').on('click',remove);
-
-
         containerOfOneTask.append(components);
-        if(!(id)){
+        if(!($('#task' + task._id).length)){
             container.append(containerOfOneTask);
         }
         $('#enterTask').val('');
-
-
-        //     );
-        // var components = $('<div>').attr({
-        //     'id' : 'components'+ task._id,
-        //     'class' : 'containerOfOneTask' 
-        // });
-
-        // var div = $('<div>').attr({
-        //     'data-id' : task._id,
-        //     'class' : 'showValueOfTask'
-        // });
-        // div.on('dblclick', changeDivToInput);
-        // div.text(task.task);
-        // var checkbox = $('<input>').attr({
-        //     'data-id' : task._id,
-        //     'class' : 'checkbox',
-        //     'type' : 'checkbox',
-        //     'checked' : task.status
-        // });
-        // if(task.status == true){
-        //     div.attr({
-        //         'class' : 'checkedTask'
-        //     });
-        // }
-        // checkbox.on("click", mark);
-
-        // var button = $('<button>').attr({
-        //     'data-id' : task._id,
-        //     'class' : 'button'
-        // });
-        // button.on('click',remove);
-        // button.text('R');
-          
-        
-
-        // components.append(checkbox).append(div).append(button);
-        // containerOfOneTask.append(components);
-        // if(!(id)){
-        //     container.append(containerOfOneTask);
-        // }
     }
 
     /**
@@ -93,36 +61,11 @@
     function displayBottomContainer(){
         var container = $('#bottomContainer');
         container.html('');
-
-        var countOfTasks = $('<div>').attr({
-            'id' : "countOfTask",
-            'class' : 'countOfTask'
-        });
-        countOfTasks.text('Task to do: ' + taskToDo);
-            
-        var active = $('<button>').attr({
-            'id' : 'active',
-            'class' : 'buttomFilter'
-        });
-        active.on('click', filter);
-        active.text('Active');
-            
-
-        var completed = $('<button>').attr({
-            'id' : 'completed',
-            'class' : 'buttomFilter'
-        });
-        completed.on('click', filter);
-        completed.text('Completed');
-
-        var all = $('<button>').attr({
-            'id' : 'all',
-            'class' : 'buttomFilter'
-        });
-        all.on('click', filter);
-        all.text('All');
-
-        container.append(countOfTasks).append(all).append(active).append(completed);
+        var bottomContainer = template({taskToDo:taskToDo},templateBottomContainer);
+        bottomContainer.find('#active').on('click', filter);
+        bottomContainer.find('#completed').on('click', filter);
+        bottomContainer.find('#all').on('click', filter);
+        container.append(bottomContainer);
     }
 
     /**
@@ -146,7 +89,7 @@
     * @param {Event} e.
     */ 
     function createTask(e){
-        var taskName = document.getElementById('enterTask').value;
+        var taskName = $('#enterTask').val();
         if (e.keyCode === 13){
             if( taskName != ''){
                 collectionOfTask.create(
@@ -193,7 +136,7 @@
                     taskToDo++;
                 }
                 $('#components'+ e.target.getAttribute('data-id')).remove();
-                displayTask(task, e.target.getAttribute('data-id'));
+                displayTask(task);
 
                 $('#countOfTask').text('').text('Task to do: ' + taskToDo);
             },
@@ -283,9 +226,8 @@
 
         if($('.inputboxForChange').length){
             var task = collectionOfTask.getElementById($('.inputboxForChange')[0].id);
-            console.log(task);
             $('#components' + task._id).remove();
-            displayTask(task, task._id);
+            displayTask(task);
         }
 
         var div = $("div[data-id='" + e.target.getAttribute('data-id') + "']");
@@ -318,7 +260,7 @@
                     function(newTask){
                         var task = JSON.parse(newTask);
                         $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
-                        displayTask(task, e.target.parentNode.getAttribute('data-id'));
+                        displayTask(task);
                     },
                     error
                 );
@@ -327,7 +269,7 @@
         {
             var task = collectionOfTask.getElementById(e.target.parentNode.getAttribute('data-id'));
             $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
-            displayTask(task, e.target.parentNode.getAttribute('data-id'));
+            displayTask(task);
         }
     }
 
