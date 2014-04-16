@@ -4,7 +4,7 @@
     */  
     var taskToDo = 0,
         collectionOfTask,
-        ElementWhichUpdating,
+        elementId,
         templateTask = '<div id="components{{_id}}" class="containerOfOneTask">'+
                             '<input class="checkbox" type="checkbox" data-id="{{_id}}" {{checked}}></input>'+
                             '<div class="{{statusClass}}" data-id="{{_id}}">'+
@@ -47,13 +47,15 @@
 
         var components = template(task, templateTask);
 
-        components.find('div').on('dblclick', changeDivToInput);
+        components.find('div').on('dblclick', createForm);
+       // components.find('div').on('click', createForm);
         components.find('input').on("click", mark);
         components.find('button').on('click',remove);
         containerOfOneTask.append(components);
         if(!($('#task' + task._id).length)){
             container.append(containerOfOneTask);
         }
+       // $('.' + task.statusClass).on('click', createForm);
         $('#enterTask').val('');
     }
 
@@ -224,55 +226,126 @@
     * Changing html element div to input for changing value of target task 
     * @param {Event} e.
     */
-    function changeDivToInput(e) {
+    // function changeDivToInput(e) {
 
-        if($('.inputboxForChange').length){
-            var task = collectionOfTask.getElementById($('.inputboxForChange')[0].id);
-            $('#components' + task._id).remove();
-            displayTask(task);
-        }
+    //     if($('.inputboxForChange').length){
+    //         var task = collectionOfTask.getElementById($('.inputboxForChange')[0].id);
+    //         $('#components' + task._id).remove();
+    //         displayTask(task);
+    //     }
 
-        var div = $("div[data-id='" + e.target.getAttribute('data-id') + "']");
-        var inputbox = $('<input>').attr({
-            'id' : e.target.getAttribute('data-id'),
-            'class' : 'inputboxForChange',
+    //     var div = $("div[data-id='" + e.target.getAttribute('data-id') + "']");
+    //     var inputbox = $('<input>').attr({
+    //         'id' : e.target.getAttribute('data-id'),
+    //         'class' : 'inputboxForChange',
+    //         'type' : 'text'
+    //     });
+
+    //     inputbox.on("keydown", change);
+    //     inputbox.val(div.text());
+    //     div.text('').append(inputbox);
+    //     inputbox.focus();
+    //     inputbox.select();
+    // }
+
+    // /**
+    // * Changing value of task on new value.
+    // * @param {Event} e.
+    // */
+    // function change(e)
+    // {   
+    //     if (e.keyCode === 13)
+    //     {
+    //          collectionOfTask.update(
+    //                 {
+    //                     task: e.target.value,
+    //                     _id: e.target.parentNode.getAttribute('data-id')
+    //                 },
+    //                 function(newTask){
+    //                     var task = JSON.parse(newTask);
+    //                     $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
+    //                     displayTask(task);
+    //                 },
+    //                 error
+    //             );
+    //     }
+    //     if(e.keyCode === 27)
+    //     {
+    //         var task = collectionOfTask.getElementById(e.target.parentNode.getAttribute('data-id'));
+    //         $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
+    //         displayTask(task);
+    //     }
+    // }
+
+
+
+    function createForm(e){
+
+         elementId =  e.target.getAttribute('data-id');
+
+        var parenDiv = $('<div>').attr({
+            'id': 'parentForm'
+        });
+
+        var div = $('<div>').attr({
+            'id' : 'form'
+        });
+
+        var input = $('<input>').attr({
+            'class' : 'input',
             'type' : 'text'
         });
 
-        inputbox.on("keydown", change);
-        inputbox.val(div.text());
-        div.text('').append(inputbox);
-        inputbox.focus();
-        inputbox.select();
+        input.val($("div[data-id='" + elementId + "']").text());
+        var buttonEnter =  $('<button>').attr({
+            'id' : 'buttonEnter',
+            'class' : 'showValue'
+        });
+        buttonEnter.on('click', showValue);
+        buttonEnter.text('Change');
+
+        var buttonEsc =  $('<button>').attr({
+            'id' : 'buttonEsc',
+            'class' : 'showValue'
+        });
+        buttonEsc.on('click', showValue);
+        buttonEsc.text('Close');
+
+
+        div.append(input);
+        div.append(buttonEnter);
+        div.append(buttonEsc);
+
+        parenDiv.append(div);
+        $('#conteinerForDisply').append(parenDiv);
+        input.focus();
+        input.select();
     }
 
-    /**
-    * Changing value of task on new value.
-    * @param {Event} e.
-    */
-    function change(e)
-    {   
-        if (e.keyCode === 13)
-        {
-             collectionOfTask.update(
+    function showValue(e){
+        if(e.target.id === 'buttonEnter'){
+            var value = ($('.input').val());
+            collectionOfTask.update(
                     {
-                        task: e.target.value,
-                        _id: e.target.parentNode.getAttribute('data-id')
+                        task: value,
+                        _id: elementId
                     },
                     function(newTask){
                         var task = JSON.parse(newTask);
-                        $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
+                        $('#components'+ elementId).remove();
                         displayTask(task);
                     },
                     error
                 );
+            $('#parentForm').remove();
         }
-        if(e.keyCode === 27)
-        {
-            var task = collectionOfTask.getElementById(e.target.parentNode.getAttribute('data-id'));
-            $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
+        if(e.target.id === 'buttonEsc'){
+            var task = collectionOfTask.getElementById(elementId);
+            $('#components'+ elementId).remove();
             displayTask(task);
+            $('#parentForm').remove();
         }
+        
     }
 
     $(function(){
