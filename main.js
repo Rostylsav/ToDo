@@ -44,7 +44,9 @@
         }
         task.statusClass = task.status ? 'checkedTask' : 'showValueOfTask';
         task.checked = task.status ? 'checked = "checked"' : '';
+
         var components = template(task, templateTask);
+
         components.find('div').on('dblclick', changeDivToInput);
         components.find('input').on("click", mark);
         components.find('button').on('click',remove);
@@ -62,15 +64,15 @@
         var container = $('#bottomContainer');
         container.html('');
         var bottomContainer = template({taskToDo:taskToDo},templateBottomContainer);
-        bottomContainer.find('#active').on('click', filter);
-        bottomContainer.find('#completed').on('click', filter);
-        bottomContainer.find('#all').on('click', filter);
         container.append(bottomContainer);
+        $('#active').on('click', filter);
+        $('#completed').on('click', filter);
+        $('#all').on('click', filter);
     }
 
     /**
     * Shows all task
-    * @param {Array} array. collectionOfTask of task for display.
+    * @param {Array} array. collection of task for display.
     */ 
     function showAllTasks(array){
         $('#containerShowTask').text('');
@@ -112,7 +114,7 @@
     }
 
     /**
-    * Changing status and css style of task.
+    * Change status and css style of task.
     * @param {Event} e.
     */ 
     function mark(e){
@@ -121,7 +123,7 @@
         if(e.target.checked){
             isCheck = true;
         }
-        collectionOfTask.updata(
+        collectionOfTask.update(
             {
                 status: isCheck,
                 _id:e.target.getAttribute('data-id')
@@ -169,7 +171,7 @@
 
 
     /**
-    * Changing status of all task and display them.
+    * Change status of all tasks and display them.
     * @param {Event} e.
     */
     function checkAll(e){
@@ -185,7 +187,7 @@
             taskToDo = array.length;
         }
         for (var i = 0; i < array.length; i++){
-            collectionOfTask.updata(
+            collectionOfTask.update(
                 {
                     status: isCheck,
                     _id:array[i]._id
@@ -252,7 +254,7 @@
     {   
         if (e.keyCode === 13)
         {
-             collectionOfTask.updata(
+             collectionOfTask.update(
                     {
                         task: e.target.value,
                         _id: e.target.parentNode.getAttribute('data-id')

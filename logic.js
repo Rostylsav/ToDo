@@ -5,7 +5,7 @@
     * @param {String} url. Adres of file which contains data.
     * @param {Function} callback. Function which will run after receiving data.
     * @param {Function} callbackError. Function which will run if will be some errors.
-    * @param {Object} obj. It contains properties method{string}(name of method for creation XmlHttpRequest) and
+    * @param {Object} obj. It contains properties: method{string}(name of method for creation XmlHttpRequest) and
     * data{string}(data to send to the server).
     */  
 	function reqRes(url, callback, callbackError, obj) 
@@ -53,6 +53,11 @@
         xhr.send(data);
     } 
 
+    /**
+    * Creates a DOM element
+    * @param {Object} obj. It contains properties which we will use for create a DOM element
+    * @param {String} row. String which contains a structure of DOM element.
+    */
     function template(obj, row){
         for (var property in obj){
             var stringProperty = '{{' + property + '}}'; 
@@ -60,6 +65,7 @@
         }
         return $(row);
     }
+
     /**
     *  Global functions.
     */
