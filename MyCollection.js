@@ -124,6 +124,7 @@
         /**
         * Get elment from collection by id.
         * @param {Number} id. Id of element.
+        * @returns {Object}  element of collection.
         */
 		this.getElementById = function( id ){
 			for( var i = 0 ; i < this.collection.length; i++)
@@ -137,16 +138,25 @@
 
         /**
         * Get new colection by property.
-        * @param {Mixed} condition. Property for filter.
+        * @param {Object} obj. Object with property for filter colection.
+        * @returns {Array} resul. Filtered array of elements.
         */
-		this.getFilteredCollection = function (condition){
-			var arrayToDisplay = [];
-			for (var i = 0; i < this.collection.length; i++){
-	            if(this.collection[i].status === condition){
-	                arrayToDisplay.push(this.collection[i]);
-	            }
-	        }
-	        return arrayToDisplay;
+		this.getFilteredCollection = function (obj){
+            var result = this.collection,
+                proxyCollection = [];
+
+            for ( var item in obj){
+                for (var i = 0; i < result.length; i++){
+                    if(result[i].hasOwnProperty(item)){
+                        if(result[i][item] === obj[item]){
+                            proxyCollection.push(result[i]);
+                        }
+                    }
+                }
+                result = proxyCollection;
+                proxyCollection = [];
+            }
+            return result;
 		};
 	}
 	window.MyCollection = MyCollection;

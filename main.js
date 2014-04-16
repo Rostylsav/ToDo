@@ -213,7 +213,7 @@
         if(e.target.id === 'active'){
             isCheck = false;
         }
-        arrayToDisplay = collectionOfTask.getFilteredCollection(isCheck);    
+        arrayToDisplay = collectionOfTask.getFilteredCollection({status:isCheck });  
         showAllTasks(arrayToDisplay);
         if(e.target.id === 'all'){
             showAllTasks(collectionOfTask.collection);
