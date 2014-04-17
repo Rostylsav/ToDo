@@ -51,18 +51,16 @@
         }
         task.statusClass = task.status ? 'checkedTask' : 'showValueOfTask';
         task.checked = task.status ? 'checked = "checked"' : '';
-
         var components = template( templateTask, task);
-
         components.find('div').on('dblclick', createForm);
-       // components.find('div').on('click', createForm);
         components.find('input').on("click", mark);
         components.find('button').on('click',remove);
         containerOfOneTask.append(components);
         if(!($('#task' + task._id).length)){
             container.append(containerOfOneTask);
+            containerOfOneTask.hide();
+            containerOfOneTask.show(500);
         }
-       // $('.' + task.statusClass).on('click', createForm);
         $('#enterTask').val('');
     }
 
@@ -128,7 +126,6 @@
     */ 
     function mark(e){
         var isCheck = false;
-
         if(e.target.checked){
             isCheck = true;
         }
@@ -148,7 +145,6 @@
                 }
                 $('#components'+ e.target.getAttribute('data-id')).remove();
                 displayTask(task);
-
                 $('#countOfTask').text('').text('Task to do: ' + taskToDo);
             },
             error
@@ -161,21 +157,19 @@
     */
     function remove(e){
         var id = e.target.getAttribute('data-id');
-
         if(!( ( collectionOfTask.getElementById( id )).status )){
             taskToDo--;
         }
-
         collectionOfTask.remove(
-                {
-                    _id: id
-                },
-                function (){
-                    $('#countOfTask').text('').text('Task to do: ' + taskToDo);
-                    $('#task' + e.target.getAttribute('data-id')).remove();
-                },
-                error
-            );
+            {
+                _id: id
+            },
+            function (){
+                $('#countOfTask').text('').text('Task to do: ' + taskToDo);
+                $('#task' + e.target.getAttribute('data-id')).hide(500, 'linear', function(){ $('#task' + e.target.getAttribute('data-id')).remove();});
+            },
+            error
+        );
     }
 
 
@@ -187,7 +181,6 @@
         var isCheck = false,
             array = collectionOfTask.collection;
             $('#containerShowTask').html('');
-
         if(e.target.checked){
            isCheck = true;
            taskToDo = 0;
@@ -218,7 +211,6 @@
     function filter(e){
         var arrayToDisplay = [],
             isCheck = true;
-
         if(e.target.id === 'active'){
             isCheck = false;
         }
@@ -234,7 +226,6 @@
     */
     function createForm(e){
         elementId =  e.target.getAttribute('data-id');
-
         if(!($('#parentForm').length)){
             var form = template(templateFormForChange);
             form.find('#buttonEnter').on('click', showValue);
@@ -279,15 +270,12 @@
             $('#parentForm').hide();
             $('#form').hide();
         }
-        
     }
 
     $(function(){
         collectionOfTask = new MyCollection('http://localhost:3000/task');
-
         $('#enterTask').on('keypress',createTask);
-        4('#checkAll').on('click', checkAll);
-        
+        $('#checkAll').on('click', checkAll);
         collectionOfTask.load(
             function (data){
                 showAllTasks(data);
