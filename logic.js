@@ -58,10 +58,12 @@
     * @param {Object} obj. It contains properties which we will use for create a DOM element
     * @param {String} row. String which contains a structure of DOM element.
     */
-    function template(obj, row){
-        for (var property in obj){
-            var stringProperty = '{{' + property + '}}'; 
-            row = row.replace(new RegExp(stringProperty,'g'),obj[property]);
+    function template(row, obj){
+        if(obj){
+            for (var property in obj){
+                var stringProperty = '{{' + property + '}}'; 
+                row = row.replace(new RegExp(stringProperty,'g'),obj[property]);
+            }
         }
         return $(row);
     }

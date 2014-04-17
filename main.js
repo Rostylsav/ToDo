@@ -17,7 +17,14 @@
                                     '</div>'+
                                     '<button id="all" class="buttomFilter">All</button>'+
                                     '<button id="active" class="buttomFilter">Active</button>'+
-                                    '<button id="completed" class="buttomFilter">Completed</button>';
+                                    '<button id="completed" class="buttomFilter">Completed</button>',
+
+        templateFormForChange = '<div id="parentForm"></div>'+
+                                '<div id="form" style="display: block;">'+
+                                    '<input class="input" type="text"></input>'+
+                                    '<button id="buttonEnter" class="showValue">Change</button>'+
+                                    '<button id="buttonEsc" class="showValue">Close</button>'+
+                                '</div>';
 
     /**
     * Called in case of error during request to the server.
@@ -45,7 +52,7 @@
         task.statusClass = task.status ? 'checkedTask' : 'showValueOfTask';
         task.checked = task.status ? 'checked = "checked"' : '';
 
-        var components = template(task, templateTask);
+        var components = template( templateTask, task);
 
         components.find('div').on('dblclick', createForm);
        // components.find('div').on('click', createForm);
@@ -65,7 +72,7 @@
     function displayBottomContainer(){
         var container = $('#bottomContainer');
         container.html('');
-        var bottomContainer = template({taskToDo:taskToDo},templateBottomContainer);
+        var bottomContainer = template(templateBottomContainer, {taskToDo:taskToDo});
         container.append(bottomContainer);
         $('#active').on('click', filter);
         $('#completed').on('click', filter);
@@ -221,107 +228,31 @@
             showAllTasks(collectionOfTask.collection);
         }
     }
-
     /**
-    * Changing html element div to input for changing value of target task 
+    * Create form for change task.
     * @param {Event} e.
     */
-    // function changeDivToInput(e) {
-
-    //     if($('.inputboxForChange').length){
-    //         var task = collectionOfTask.getElementById($('.inputboxForChange')[0].id);
-    //         $('#components' + task._id).remove();
-    //         displayTask(task);
-    //     }
-
-    //     var div = $("div[data-id='" + e.target.getAttribute('data-id') + "']");
-    //     var inputbox = $('<input>').attr({
-    //         'id' : e.target.getAttribute('data-id'),
-    //         'class' : 'inputboxForChange',
-    //         'type' : 'text'
-    //     });
-
-    //     inputbox.on("keydown", change);
-    //     inputbox.val(div.text());
-    //     div.text('').append(inputbox);
-    //     inputbox.focus();
-    //     inputbox.select();
-    // }
-
-    // /**
-    // * Changing value of task on new value.
-    // * @param {Event} e.
-    // */
-    // function change(e)
-    // {   
-    //     if (e.keyCode === 13)
-    //     {
-    //          collectionOfTask.update(
-    //                 {
-    //                     task: e.target.value,
-    //                     _id: e.target.parentNode.getAttribute('data-id')
-    //                 },
-    //                 function(newTask){
-    //                     var task = JSON.parse(newTask);
-    //                     $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
-    //                     displayTask(task);
-    //                 },
-    //                 error
-    //             );
-    //     }
-    //     if(e.keyCode === 27)
-    //     {
-    //         var task = collectionOfTask.getElementById(e.target.parentNode.getAttribute('data-id'));
-    //         $('#components'+ e.target.parentNode.getAttribute('data-id')).remove();
-    //         displayTask(task);
-    //     }
-    // }
-
-
-
     function createForm(e){
+        elementId =  e.target.getAttribute('data-id');
 
-         elementId =  e.target.getAttribute('data-id');
-
-        var parenDiv = $('<div>').attr({
-            'id': 'parentForm'
-        });
-
-        var div = $('<div>').attr({
-            'id' : 'form'
-        });
-
-        var input = $('<input>').attr({
-            'class' : 'input',
-            'type' : 'text'
-        });
-
-        input.val($("div[data-id='" + elementId + "']").text());
-        var buttonEnter =  $('<button>').attr({
-            'id' : 'buttonEnter',
-            'class' : 'showValue'
-        });
-        buttonEnter.on('click', showValue);
-        buttonEnter.text('Change');
-
-        var buttonEsc =  $('<button>').attr({
-            'id' : 'buttonEsc',
-            'class' : 'showValue'
-        });
-        buttonEsc.on('click', showValue);
-        buttonEsc.text('Close');
-
-
-        div.append(input);
-        div.append(buttonEnter);
-        div.append(buttonEsc);
-
-        parenDiv.append(div);
-        $('#conteinerForDisply').append(parenDiv);
-        input.focus();
-        input.select();
+        if(!($('#parentForm').length)){
+            var form = template(templateFormForChange);
+            form.find('#buttonEnter').on('click', showValue);
+            form.find('#buttonEsc').on('click', showValue);
+            $('#conteinerForDisply').append(form);
+            form.hide();
+        }
+        $('#parentForm').show(0);
+        $('#form').show(500);
+        $('.input').val($("div[data-id='" + elementId + "']").text());
+        $('.input').focus();
+        $('.input').select();
     }
 
+    /**
+    * if press enter display new name of task , if press esc return old name of task.
+    * @param {Event} e.
+    */
     function showValue(e){
         if(e.target.id === 'buttonEnter'){
             var value = ($('.input').val());
@@ -337,13 +268,16 @@
                     },
                     error
                 );
-            $('#parentForm').remove();
+            $('#parentForm').hide();
+            $('#form').hide();
         }
         if(e.target.id === 'buttonEsc'){
+            console.log('work');
             var task = collectionOfTask.getElementById(elementId);
             $('#components'+ elementId).remove();
             displayTask(task);
-            $('#parentForm').remove();
+            $('#parentForm').hide();
+            $('#form').hide();
         }
         
     }
@@ -351,8 +285,8 @@
     $(function(){
         collectionOfTask = new MyCollection('http://localhost:3000/task');
 
-        document.getElementById('enterTask').addEventListener('keypress',createTask,false);
-        document.getElementById('checkAll').addEventListener('click', checkAll, false);
+        $('#enterTask').on('keypress',createTask);
+        4('#checkAll').on('click', checkAll);
         
         collectionOfTask.load(
             function (data){

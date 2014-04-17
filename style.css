@@ -105,7 +105,8 @@ input[type="checkbox"],input[type="text"] {
     height: 100%;
     width: 100%;
     position: fixed;
-    z-index: 100;
+    background: #999;
+	opacity: 0.5;
     top: 0;
     left: 0;
 }
