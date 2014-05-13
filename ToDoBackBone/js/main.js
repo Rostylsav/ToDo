@@ -23,7 +23,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
             });
             var TodoList = Backbone.Collection.extend({
                 model: Todo,
-                localStorage: new Store("todos-backbone"),
+                localStorage: new Store("listOfTasks"),
                 done: function() {
                     return this.filter(function(todo){ return todo.get('done'); });
                 },
