@@ -1,6 +1,5 @@
 require(['jquery', 'underscore', 'backbone','backbone.localStorage'], 
     function (){
-        $(function(){
             var index = 1;
             var Todo = Backbone.Model.extend({
                 defaults: {
@@ -19,11 +18,11 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 remove: function() {
                     this.destroy();
                 }
-
             });
+
             var TodoList = Backbone.Collection.extend({
                 model: Todo,
-                localStorage: new Store("listOfTasks"),
+                localStorage : new Store("listOfTasks"),
                 done: function() {
                     return this.filter(function(todo){ return todo.get('done'); });
                 },
@@ -31,9 +30,9 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     return this.without.apply(this, this.done());
                 }
             });
-            var Todos = new TodoList;
+            var todos = new TodoList;
 
-            var TodoView = Backbone.View.extend({
+            var TaskView = Backbone.View.extend({
                 tagName:  "li",
                 template: _.template($('#item-template').html()),
                 events: {
@@ -57,50 +56,74 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     this.model.remove();
                 }
             });
+
             var AppView = Backbone.View.extend({
                 el: $("#containerForTodo"),
                 events: {
                     "keypress #newTask":  "createOnEnter",
-                    "click #chackAll": "chackAll"
+                    "click #chackAll": "chackAll",
+                    "click #all": 'allTasks',
+                    "click #active": 'activeTasks',
+                    "click #done": 'doneTasks'
                 },
                 initialize: function() {
                     this.input = this.$("#newTask");
                     this.allCheckbox = this.$("#chackAll")[0];
 
-                    Todos.bind('add', this.addOne, this);
-                    Todos.bind('all', this.render, this);
+                    todos.bind('add', this.displayTask, this);
+                    todos.bind('all', this.render, this);
+
                     this.main = $('#containerForTasks');
-                    Todos.fetch();
+                    todos.fetch();
                 },
                 render: function() {
-                    var done = Todos.done().length;
-                    var remaining = Todos.remaining().length;
-                    if (Todos.length) {
+                    if (todos.length) {
                         this.main.show();
                     }
                     else {
                         this.main.hide();
                     }
-                    this.allCheckbox.checked = !remaining;
                 },
-                addOne: function(todo) {
-                    var view = new TodoView({model: todo});
+                displayTask: function(todo) {
+                    var view = new TaskView({model: todo});
                     this.$("#listOfTasks").append(view.render().el);
                 },
                 createOnEnter: function(e) {
+                    var that = this;
                     if (e.keyCode === 13){
                         if (this.input.val()) {
-                            Todos.create({title: this.input.val()});
+                            todos.create({title: this.input.val()});
                             this.input.val('');
                         }
                     }
                 },
                 chackAll: function () {
                     var done = this.allCheckbox.checked;
-                    Todos.each(function (todo) { todo.save({'done': done}); });
+                    todos.each(function (todo) { todo.save({'done': done}); });
+                },
+
+                displayAll: function(array){
+                    var that = this;
+                    this.$("#listOfTasks").html('');
+                    array.forEach(
+                        function(task){
+                            that.displayTask(task);
+                        }
+                    );
+                },
+                allTasks: function(){
+                    this.displayAll(todos.models);
+                },
+                activeTasks: function(){
+                    this.displayAll(todos.remaining());
+                },
+                doneTasks: function(){
+                    this.displayAll(todos.done());
                 }
             });
-             var App = new AppView;
+        $(function(){
+            var app = new AppView;
+            app.displayAll(todos.models);
             //localStorage.clear();
         });
     }
