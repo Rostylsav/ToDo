@@ -1,6 +1,7 @@
 require(['jquery', 'underscore', 'backbone','backbone.localStorage'], 
     function (){
             var index = 1;
+
             var Task = Backbone.Model.extend({
                 defaults: {
                     title: "Something to do...",
@@ -24,7 +25,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 model: Task,
                 localStorage : new Store("listOfTasks"),
                 done: function() {
-                    return this.filter(function(todo){ return todo.get('done'); });
+                    return this.filter(function(task){ return task.get('done'); });
                 },
                 remaining: function() {
                     return this.without.apply(this, this.done());
@@ -84,8 +85,8 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                         this.main.hide();
                     }
                 },
-                displayTask: function(todo) {
-                    var view = new TaskView({model: todo});
+                displayTask: function(task) {
+                    var view = new TaskView({model: task});
                     this.$("#listOfTasks").append(view.render().el);
                 },
                 createOnEnter: function(e) {
@@ -98,7 +99,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 },
                 chackAll: function () {
                     var done = this.allCheckbox.checked;
-                    tasksList.each(function (todo) { todo.save({'done': done}); });
+                    tasksList.each(function (task) { task.save({'done': done}); });
                 },
 
                 displayAll: function(array){
