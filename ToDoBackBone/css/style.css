@@ -24,6 +24,7 @@ body {
 	margin-bottom: 40px;
 }
 
+
 #containerForTodo input[type="text"] {
 	width: 400px;
 	font-size: 24px;
@@ -69,4 +70,7 @@ body {
   	background-position: 0 -20px;
 }
 
-
+#countOfTasks{
+	float: left;
+	margin-right: 30px;
+}

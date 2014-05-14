@@ -80,6 +80,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 render: function() {
                     if (tasksList.length) {
                         this.main.show();
+                        this.main.find('#countOfTasks').text('task to do ' + tasksList.remaining().length);
                     }
                     else {
                         this.main.hide();
@@ -123,7 +124,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
             });
         $(function(){
             var app = new AppView;
-            app.displayAll(tasksList.models);
+            //app.displayAll(tasksList.models);
             //localStorage.clear();
         });
     }
