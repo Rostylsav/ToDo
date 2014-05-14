@@ -15,7 +15,7 @@
             <input id = "newTask" type = "text" placeholder = "What needs to do?">
 
             <div id = "containerForTasks">
-                <ul id = "listOfTasks"></ul>
+                <div id = "listOfTasks"></div>
                 <div id = "buttons">
                     <button id = 'all'> All </button>
                     <button id = 'active'> Active </button>
@@ -25,11 +25,9 @@
         </div>
 
         <script type = "text/template" id = "item-template">
-            <div class = "view">
-                <input class = "toggle" type = "checkbox" <%= done ? 'checked="checked"' : '' %> />
-                <label><%- title %></label>
-                <a class = "destroy">R</a>
-            </div>
+            <input class = "toggle" type = "checkbox" <%= done ? 'checked="checked"' : '' %> />
+            <label><%- title %></label>
+            <button class = "destroy"> R </button>
       </script>
     </body>
 </html>

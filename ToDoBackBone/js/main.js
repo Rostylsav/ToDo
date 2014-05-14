@@ -1,14 +1,14 @@
 require(['jquery', 'underscore', 'backbone','backbone.localStorage'], 
     function (){
             var index = 1;
-            var Todo = Backbone.Model.extend({
+            var Task = Backbone.Model.extend({
                 defaults: {
                     title: "Something to do...",
                     order: index,
                     done: false
                 },
                 initialize: function() {
-                    if (!this.get("title")) {
+                    if (this.get("title") === '') {
                         this.set({"title": this.defaults.title});
                     }
                 },
@@ -20,8 +20,8 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 }
             });
 
-            var TodoList = Backbone.Collection.extend({
-                model: Todo,
+            var TasksList = Backbone.Collection.extend({
+                model: Task,
                 localStorage : new Store("listOfTasks"),
                 done: function() {
                     return this.filter(function(todo){ return todo.get('done'); });
@@ -30,14 +30,14 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     return this.without.apply(this, this.done());
                 }
             });
-            var todos = new TodoList;
+            var tasksList = new TasksList;
 
             var TaskView = Backbone.View.extend({
-                tagName:  "li",
+                tagName:  "div",
                 template: _.template($('#item-template').html()),
                 events: {
                     "click .toggle"   : "toggleDone",
-                    "click a.destroy" : "del"
+                    "click button.destroy" : "del"
                 },
 
                 initialize: function() {
@@ -70,14 +70,14 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     this.input = this.$("#newTask");
                     this.allCheckbox = this.$("#chackAll")[0];
 
-                    todos.bind('add', this.displayTask, this);
-                    todos.bind('all', this.render, this);
+                    tasksList.bind('add', this.displayTask, this);
+                    tasksList.bind('all', this.render, this);
 
                     this.main = $('#containerForTasks');
-                    todos.fetch();
+                    tasksList.fetch();
                 },
                 render: function() {
-                    if (todos.length) {
+                    if (tasksList.length) {
                         this.main.show();
                     }
                     else {
@@ -89,17 +89,16 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     this.$("#listOfTasks").append(view.render().el);
                 },
                 createOnEnter: function(e) {
-                    var that = this;
                     if (e.keyCode === 13){
                         if (this.input.val()) {
-                            todos.create({title: this.input.val()});
+                            tasksList.create({title: this.input.val()});
                             this.input.val('');
                         }
                     }
                 },
                 chackAll: function () {
                     var done = this.allCheckbox.checked;
-                    todos.each(function (todo) { todo.save({'done': done}); });
+                    tasksList.each(function (todo) { todo.save({'done': done}); });
                 },
 
                 displayAll: function(array){
@@ -112,18 +111,18 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     );
                 },
                 allTasks: function(){
-                    this.displayAll(todos.models);
+                    this.displayAll(tasksList.models);
                 },
                 activeTasks: function(){
-                    this.displayAll(todos.remaining());
+                    this.displayAll(tasksList.remaining());
                 },
                 doneTasks: function(){
-                    this.displayAll(todos.done());
+                    this.displayAll(tasksList.done());
                 }
             });
         $(function(){
             var app = new AppView;
-            app.displayAll(todos.models);
+            app.displayAll(tasksList.models);
             //localStorage.clear();
         });
     }

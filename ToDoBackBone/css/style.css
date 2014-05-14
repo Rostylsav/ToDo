@@ -41,31 +41,27 @@ body {
 	list-style: none;
 }
 
-#listOfTasks li {
-	padding: 18px 20px 18px 0;
+#listOfTasks div {
+	padding: 10px 20px 10px 0;
 	position: relative;
 	font-size: 24px;
 	border-bottom: 1px solid #cccccc;
 }
 
-#listOfTasks li:last-child {
-	border-bottom: none;
-}
-
-#listOfTasks li.done label {
+#listOfTasks div.done label {
 	color: red;
 	text-decoration: line-through;
 }
 
 #listOfTasks .destroy {
 	position: absolute;
-	right: 25px;
+	right: 13px;
 	top: 20px;
 	display: none;
 	cursor: pointer;
 }
 
-#listOfTasks li:hover .destroy {
+#listOfTasks div:hover .destroy {
   	display: block;
 }
 
