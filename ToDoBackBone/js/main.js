@@ -100,7 +100,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 },
                 chackAll: function () {
                     var done = this.allCheckbox.checked;
-                    tasksList.each(function (task) { task.save({'done': done}); });
+                    tasksList.forEach(function (task) { task.save({'done': done}); });
                 },
 
                 displayAll: function(array){
