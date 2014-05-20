@@ -43,7 +43,7 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
 
                 initialize: function() {
                     this.model.bind('change', this.render, this);
-                    this.model.bind('destroy', this.remove, this);
+                    this.model.bind('destroy', this.del, this);
                 },
                 render: function() {
                     this.$el.html(this.template(this.model.toJSON()));
