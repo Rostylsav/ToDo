@@ -16,14 +16,15 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 toggle: function() {
                     this.save({done: !this.get("done")});
                 },
-                remove: function() {
+                clear: function() {
+                	console.log('model destroy');
                     this.destroy();
                 }
             });
 
             var TasksList = Backbone.Collection.extend({
                 model: Task,
-                localStorage : new Store("listOfTasks"),
+                url : 'http://localhost:3000/task',
                 done: function() {
                     return this.filter(function(task){ return task.get('done'); });
                 },
@@ -38,12 +39,12 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 template: _.template($('#item-template').html()),
                 events: {
                     "click .toggle"   : "toggleDone",
-                    "click button.destroy" : "del"
+                    "click button.destroy" : "clear"
                 },
 
                 initialize: function() {
                     this.model.bind('change', this.render, this);
-                    this.model.bind('destroy', this.del, this);
+                    this.model.bind('destroy', this.remove, this);
                 },
                 render: function() {
                     this.$el.html(this.template(this.model.toJSON()));
@@ -53,15 +54,17 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                 toggleDone: function() {
                     this.model.toggle();
                 },
-                del: function() {
-                    this.model.remove();
+                clear: function() {
+                	console.log('colection delete');
+                    this.model.clear();
+
                 }
             });
 
             var AppView = Backbone.View.extend({
                 el: $("#containerForTodo"),
                 events: {
-                    "keypress #newTask":  "createOnEnter",
+                    "keypress #newTask": "createOnEnter",
                     "click #chackAll": "chackAll",
                     "click #all": 'allTasks',
                     "click #active": 'activeTasks',
@@ -102,7 +105,6 @@ require(['jquery', 'underscore', 'backbone','backbone.localStorage'],
                     var done = this.allCheckbox.checked;
                     tasksList.forEach(function (task) { task.save({'done': done}); });
                 },
-
                 displayAll: function(array){
                     var that = this;
                     this.$("#listOfTasks").html('');
